@@ -74,10 +74,13 @@ public class MockWebServerPropertySource extends PropertySource<MockWebServer> i
             @Override
             public MockResponse dispatch(RecordedRequest request) {
                 if ("/.well-known/jwks.json".equals(request.getPath())) {
-                    return JWKS_RESPONSE;
+                    // Return the public part of the dynamic key
+                    String jwks = "{\"keys\":[" + JwtTestHelper.RSA_KEY.toPublicJWK().toJSONString() + "]}";
+                    return new MockResponse()
+                            .setHeader("Content-Type", "application/json")
+                            .setBody(jwks);
                 }
-                
-                return NOT_FOUND_RESPONSE;
+                return new MockResponse().setResponseCode(404);
             }
         };
         
