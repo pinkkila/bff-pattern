@@ -11,29 +11,16 @@ import org.apache.commons.logging.LogFactory;
 
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.core.env.PropertySource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 
 public class MockWebServerPropertySource extends PropertySource<MockWebServer> implements DisposableBean {
     
-    private static final MockResponse JWKS_RESPONSE = response(
-            "{ \"keys\": [ { \"kty\": \"RSA\", \"e\": \"AQAB\", \"n\": \"jvBtqsGCOmnYzwe_-HvgOqlKk6HPiLEzS6uCCcnVkFXrhnkPMZ-uQXTR0u-7ZklF0XC7-AMW8FQDOJS1T7IyJpCyeU4lS8RIf_Z8RX51gPGnQWkRvNw61RfiSuSA45LR5NrFTAAGoXUca_lZnbqnl0td-6hBDVeHYkkpAsSck1NPhlcsn-Pvc2Vleui_Iy1U2mzZCM1Vx6Dy7x9IeP_rTNtDhULDMFbB_JYs-Dg6Zd5Ounb3mP57tBGhLYN7zJkN1AAaBYkElsc4GUsGsUWKqgteQSXZorpf6HdSJsQMZBDd7xG8zDDJ28hGjJSgWBndRGSzQEYU09Xbtzk-8khPuw\" } ] }",
-            200);
-    
-    private static final MockResponse NOT_FOUND_RESPONSE = response(
-            "{ \"message\" : \"This mock authorization server responds to just one request: GET /.well-known/jwks.json.\" }",
-            404);
-    
-    /**
-     * Name of the random {@link PropertySource}.
-     */
     public static final String MOCK_WEB_SERVER_PROPERTY_SOURCE_NAME = "mockwebserver";
     
     private static final String NAME = "mockwebserver.url";
     
     private static final Log logger = LogFactory.getLog(MockWebServerPropertySource.class);
     
-    private boolean started;
+    private volatile boolean started;
     
     public MockWebServerPropertySource() {
         super(MOCK_WEB_SERVER_PROPERTY_SOURCE_NAME, new MockWebServer());
@@ -47,8 +34,7 @@ public class MockWebServerPropertySource extends PropertySource<MockWebServer> i
         if (logger.isTraceEnabled()) {
             logger.trace("Looking up the url for '" + name + "'");
         }
-        String url = getUrl();
-        return url;
+        return getUrl();
     }
     
     @Override
@@ -57,19 +43,22 @@ public class MockWebServerPropertySource extends PropertySource<MockWebServer> i
     }
     
     /**
-     * Get's the URL (i.e. "http://localhost:123456")
+     * Gets the URL (i.e. "http://localhost:123456")
      * @return the url with the dynamic port
      */
     private String getUrl() {
         MockWebServer mockWebServer = getSource();
         if (!this.started) {
-            intializeMockWebServer(mockWebServer);
+            initializeMockWebServer(mockWebServer);
         }
         String url = mockWebServer.url("").url().toExternalForm();
         return url.substring(0, url.length() - 1);
     }
     
-    private void intializeMockWebServer(MockWebServer mockWebServer) {
+    private synchronized void initializeMockWebServer(MockWebServer mockWebServer) {
+        if (this.started) {
+            return;
+        }
         Dispatcher dispatcher = new Dispatcher() {
             @Override
             public MockResponse dispatch(RecordedRequest request) {
@@ -94,9 +83,4 @@ public class MockWebServerPropertySource extends PropertySource<MockWebServer> i
         }
     }
     
-    private static MockResponse response(String body, int status) {
-        return new MockResponse().setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .setResponseCode(status)
-                .setBody(body);
-    }
 }

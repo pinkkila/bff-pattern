@@ -11,6 +11,8 @@ import java.util.List;
 
 public class JwtTestHelper {
     
+    public static final String DEFAULT_ISSUER = "http://mock-auth-server";
+    
     // Generate a pair once for the entire test session
     public static final RSAKey RSA_KEY = generate();
     
@@ -25,11 +27,15 @@ public class JwtTestHelper {
     }
     
     public static String generateToken(String subject, List<String> scopes) throws Exception {
+        return generateToken(subject, scopes, DEFAULT_ISSUER);
+    }
+    
+    public static String generateToken(String subject, List<String> scopes, String issuer) throws Exception {
         RSASSASigner signer = new RSASSASigner(RSA_KEY);
         
         JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
                 .subject(subject)
-                .issuer("http://mock-auth-server") // Matches the issuer in your config
+                .issuer(issuer)
                 .claim("scope", String.join(" ", scopes))
                 .expirationTime(new Date(new Date().getTime() + 60 * 1000))
                 .build();

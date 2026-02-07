@@ -26,7 +26,7 @@ public class MessageFullIntegrationTests {
     private MessageRepository messageRepository;
     
     @BeforeEach
-    void tearDown() {
+    void setUp() {
         messageRepository.deleteAll();
     }
     
