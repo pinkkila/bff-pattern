@@ -24,6 +24,11 @@ public class MessageController {
         return ResponseEntity.ok(messageService.getMessagesByUserId(authentication.getName(), pageable));
     }
     
+    @GetMapping("/{id}")
+    public ResponseEntity<MessageResponse> getMessageByIdAndUserId(Authentication authentication, @PathVariable Long id) {
+        return ResponseEntity.ok(messageService.getMessageByIdAndUserId(id, authentication.getName()));
+    }
+    
     @PostMapping
     public ResponseEntity<MessageResponse> createMessage(Authentication authentication, @RequestBody @Valid MessageRequest messageRequest, UriComponentsBuilder ucb) {
         MessageResponse createdMessage = messageService.createMessage(authentication.getName(), messageRequest);

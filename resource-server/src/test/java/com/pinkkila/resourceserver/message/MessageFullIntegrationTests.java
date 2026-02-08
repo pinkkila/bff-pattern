@@ -48,5 +48,37 @@ public class MessageFullIntegrationTests {
         }
         
     }
+    
+    @Nested
+    @DisplayName("GET /messages/{id}")
+    class GetMessageByIdTests {
+        
+        @Test
+        @DisplayName("Should return successfully requested message with 200")
+        void getMessage_Success_Returns200() throws Exception {
+            Message savedMessage = messageRepository.save(new Message(null, "Test Message", "test-user-id"));
+            String token = JwtTestHelper.generateToken("test-user-id", List.of("message:read"));
+            
+            webTestClient.get()
+                    .uri("/messages/" + savedMessage.getId())
+                    .header("Authorization", "Bearer " + token)
+                    .exchange()
+                    .expectStatus().isOk();
+        }
+        
+        @Test
+        @DisplayName("Should return MessageNotFound when userId is wrong with 404")
+        void getMessage_WrongUserId_Returns404() throws Exception {
+            Message savedMessage = messageRepository.save(new Message(null, "Test Message", "another-user-id"));
+            String token = JwtTestHelper.generateToken("test-user-id", List.of("message:read"));
+            
+            webTestClient.get()
+                    .uri("/messages/" + savedMessage.getId())
+                    .header("Authorization", "Bearer " + token)
+                    .exchange()
+                    .expectStatus().isNotFound();
+        }
+        
+    }
 
 }

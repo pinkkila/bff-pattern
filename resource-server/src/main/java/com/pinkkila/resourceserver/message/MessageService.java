@@ -1,5 +1,6 @@
 package com.pinkkila.resourceserver.message;
 
+import com.pinkkila.resourceserver.message.exception.MessageNotFound;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,6 +17,12 @@ public class MessageService {
     public Page<MessageResponse> getMessagesByUserId(String userId, Pageable pageable) {
         Page<Message> messagesPage = messageRepository.findByUserId(userId, pageable);
         return messagesPage.map(this::mapToResponse);
+    }
+    
+    public MessageResponse getMessageByIdAndUserId(Long id, String userId) {
+        return messageRepository.findByIdAndUserId(id, userId)
+                .map(this::mapToResponse)
+                .orElseThrow(() -> new MessageNotFound("Message not found with id: " + id));
     }
     
     public MessageResponse createMessage(String userId, MessageRequest messageRequest) {
