@@ -11,6 +11,7 @@ import com.pinkkila.resourceserver.TestcontainersConfiguration;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.util.List;
+import java.util.UUID;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureWebTestClient
@@ -36,15 +37,16 @@ public class MessageFullIntegrationTests {
         
         @Test
         @DisplayName("Should return successfully Page of Messages with 200")
-        void  getMessages_SuccessDefault_Returns200() throws Exception {
-           messageRepository.save(new Message(null, "Test Message", "test-user-id"));
-           String token = JwtTestHelper.generateToken("test-user-id", List.of("message:read"));
-           
-           webTestClient.get()
-                   .uri("/messages")
-                   .header("Authorization", "Bearer " + token)
-                   .exchange()
-                   .expectStatus().isOk();
+        void getMessages_SuccessDefault_Returns200() throws Exception {
+            UUID userId = UUID.randomUUID();
+            messageRepository.save(new Message(null, "Test Message", userId));
+            String token = JwtTestHelper.generateToken(userId.toString(), List.of("message:read"));
+            
+            webTestClient.get()
+                    .uri("/messages")
+                    .header("Authorization", "Bearer " + token)
+                    .exchange()
+                    .expectStatus().isOk();
         }
         
     }
@@ -56,8 +58,9 @@ public class MessageFullIntegrationTests {
         @Test
         @DisplayName("Should return successfully requested message with 200")
         void getMessage_Success_Returns200() throws Exception {
-            Message savedMessage = messageRepository.save(new Message(null, "Test Message", "test-user-id"));
-            String token = JwtTestHelper.generateToken("test-user-id", List.of("message:read"));
+            UUID userId = UUID.randomUUID();
+            Message savedMessage = messageRepository.save(new Message(null, "Test Message", userId));
+            String token = JwtTestHelper.generateToken(userId.toString(), List.of("message:read"));
             
             webTestClient.get()
                     .uri("/messages/" + savedMessage.getId())
@@ -69,8 +72,10 @@ public class MessageFullIntegrationTests {
         @Test
         @DisplayName("Should return MessageNotFound when userId is wrong with 404")
         void getMessage_WrongUserId_Returns404() throws Exception {
-            Message savedMessage = messageRepository.save(new Message(null, "Test Message", "another-user-id"));
-            String token = JwtTestHelper.generateToken("test-user-id", List.of("message:read"));
+            UUID userId = UUID.randomUUID();
+            UUID otherUserId = UUID.randomUUID();
+            Message savedMessage = messageRepository.save(new Message(null, "Test Message", otherUserId));
+            String token = JwtTestHelper.generateToken(userId.toString(), List.of("message:read"));
             
             webTestClient.get()
                     .uri("/messages/" + savedMessage.getId())
@@ -80,5 +85,5 @@ public class MessageFullIntegrationTests {
         }
         
     }
-
+    
 }

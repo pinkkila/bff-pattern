@@ -1,4 +1,4 @@
-package com.pinkkila.resourceserver.message;
+package com.pinkkila.authorizationserver.appuser;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,10 +9,10 @@ import java.util.UUID;
 
 @Data
 @AllArgsConstructor
-@Table("message")
-public class Message {
+@Table("app_user")
+public class AppUser {
     @Id
-    private Long id;
-    private String content;
-    private UUID userId;
+    private UUID id;
+    private String username;
+    private String password;
 }

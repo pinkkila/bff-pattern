@@ -9,6 +9,9 @@ import com.nimbusds.jwt.SignedJWT;
 import java.util.Date;
 import java.util.List;
 
+/*
+* check: https://docs.spring.io/spring-authorization-server/reference/getting-started.html#defining-required-components
+*/
 public class JwtTestHelper {
     
     public static final String DEFAULT_ISSUER = "http://mock-auth-server";

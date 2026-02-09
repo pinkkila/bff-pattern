@@ -19,6 +19,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import tools.jackson.databind.ObjectMapper;
 
 import java.util.List;
+import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -50,10 +51,11 @@ public class MessageControllerTests {
         @Test
         @DisplayName("Should return successfully Page of Messages with 200")
         void getMessages_SuccessDefault_Returns200() throws Exception {
+            UUID userId = UUID.randomUUID();
             MessageResponse res1 = new MessageResponse(1L, "Test message!");
             Page<MessageResponse> page = new PageImpl<>(List.of(res1), PageRequest.of(0, 20), 1);
             
-            when(messageService.getMessagesByUserId(eq("test-user"), any(Pageable.class)))
+            when(messageService.getMessagesByUserId(eq(userId), any(Pageable.class)))
                     .thenReturn(page);
             
             String expectedJson = """
@@ -75,7 +77,7 @@ public class MessageControllerTests {
             
             mockMvc.perform(get("/messages")
                             .with(jwt()
-                                    .jwt((jwt) -> jwt.subject("test-user")
+                                    .jwt((jwt) -> jwt.subject(userId.toString())
                                             .claim("scope", "message:read")
                                     )
                             ))
@@ -83,7 +85,7 @@ public class MessageControllerTests {
                     .andExpect(status().isOk())
                     .andExpect(content().json(expectedJson, JsonCompareMode.STRICT));
             
-            verify(messageService).getMessagesByUserId(eq("test-user"), any(Pageable.class));
+            verify(messageService).getMessagesByUserId(eq(userId), any(Pageable.class));
         }
         
         @Test
@@ -98,9 +100,10 @@ public class MessageControllerTests {
         @Test
         @DisplayName("Should return forbidden when there is no scope message:read with 403")
         void getMessages_NoScopeRead_Returns403() throws Exception {
+            UUID userId = UUID.randomUUID();
             mockMvc.perform(get("/messages")
                             .with(jwt()
-                                    .jwt((jwt) -> jwt.subject("test-user")
+                                    .jwt((jwt) -> jwt.subject(userId.toString())
                                     )
                             ))
 //                    .andDo(print())
@@ -113,7 +116,9 @@ public class MessageControllerTests {
         @Test
         @DisplayName("Should return empty page when user has no messages with 200")
         void getMessages_DifferentSubReturnsEmptyPage_Returns200() throws Exception {
-            when(messageService.getMessagesByUserId(eq("other-user"), any(Pageable.class)))
+            UUID userId = UUID.randomUUID();
+            UUID otherUserId = UUID.randomUUID();
+            when(messageService.getMessagesByUserId(eq(otherUserId), any(Pageable.class)))
                     .thenReturn(Page.empty());
             
             String expectedJson = """
@@ -130,15 +135,15 @@ public class MessageControllerTests {
             
             mockMvc.perform(get("/messages")
                             .with(jwt()
-                                    .jwt(jwt -> jwt.subject("other-user")
+                                    .jwt(jwt -> jwt.subject(otherUserId.toString())
                                             .claim("scope", "message:read")
                                     )
                             ))
                     .andExpect(status().isOk())
                     .andExpect(content().json(expectedJson, JsonCompareMode.STRICT));
             
-            verify(messageService).getMessagesByUserId(eq("other-user"), any(Pageable.class));
-            verify(messageService, times(0)).getMessagesByUserId(eq("test-user"), any());
+            verify(messageService).getMessagesByUserId(eq(otherUserId), any(Pageable.class));
+            verify(messageService, times(0)).getMessagesByUserId(eq(userId), any());
             
         }
         
@@ -151,7 +156,7 @@ public class MessageControllerTests {
         @Test
         @DisplayName("Successful creation should return 201 Created with response body")
         void createMessage_Success_Returns201() throws Exception {
-            String userId = "test-user";
+            UUID userId = UUID.randomUUID();
             String content = "Test message";
             MessageRequest request = new MessageRequest(content);
             MessageResponse response = new MessageResponse(1L, content);
@@ -160,7 +165,7 @@ public class MessageControllerTests {
             
             mockMvc.perform(post("/messages")
                             .with(jwt()
-                                    .jwt(jwt -> jwt.subject(userId)
+                                    .jwt(jwt -> jwt.subject(userId.toString())
                                             .claim("scope", "message:write")
                                     )
                             )
@@ -191,13 +196,14 @@ public class MessageControllerTests {
         
         @Test
         @DisplayName("Should return forbidden when there is no scope message:write with 403")
-        void getMessages_NoScopeWrite_Returns403() throws Exception {
+        void createMessage_NoScopeWrite_Returns403() throws Exception {
+            UUID userId = UUID.randomUUID();
             String content = "Test message";
             MessageRequest request = new MessageRequest(content);
             
             mockMvc.perform(post("/messages")
                             .with(jwt()
-                                    .jwt((jwt) -> jwt.subject("test-user")
+                                    .jwt((jwt) -> jwt.subject(userId.toString())
                                     )
                             )
                             .contentType(MediaType.APPLICATION_JSON)

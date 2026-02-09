@@ -6,8 +6,9 @@ import org.springframework.data.repository.ListCrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
 import java.util.Optional;
+import java.util.UUID;
 
 public interface MessageRepository extends ListCrudRepository<Message, Long>, PagingAndSortingRepository<Message, Long> {
-    Page<Message> findByUserId(String userId, Pageable pageable);
-    Optional<Message> findByIdAndUserId(Long id, String userId);
+    Page<Message> findByUserId(UUID userId, Pageable pageable);
+    Optional<Message> findByIdAndUserId(Long id, UUID userId);
 }
