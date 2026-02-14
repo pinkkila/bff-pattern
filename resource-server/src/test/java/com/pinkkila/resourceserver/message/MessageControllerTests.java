@@ -1,6 +1,7 @@
 package com.pinkkila.resourceserver.message;
 
 import com.pinkkila.resourceserver.security.SecurityConfig;
+import com.pinkkila.resourceserver.userid.UserId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -51,7 +52,7 @@ public class MessageControllerTests {
         @Test
         @DisplayName("Should return successfully Page of Messages with 200")
         void getMessages_SuccessDefault_Returns200() throws Exception {
-            UUID userId = UUID.randomUUID();
+            UserId userId = new UserId(UUID.randomUUID());
             MessageResponse res1 = new MessageResponse(1L, "Test message!");
             Page<MessageResponse> page = new PageImpl<>(List.of(res1), PageRequest.of(0, 20), 1);
             
@@ -100,7 +101,7 @@ public class MessageControllerTests {
         @Test
         @DisplayName("Should return forbidden when there is no scope message:read with 403")
         void getMessages_NoScopeRead_Returns403() throws Exception {
-            UUID userId = UUID.randomUUID();
+            UserId userId = new UserId(UUID.randomUUID());
             mockMvc.perform(get("/messages")
                             .with(jwt()
                                     .jwt((jwt) -> jwt.subject(userId.toString())
@@ -116,8 +117,8 @@ public class MessageControllerTests {
         @Test
         @DisplayName("Should return empty page when user has no messages with 200")
         void getMessages_DifferentSubReturnsEmptyPage_Returns200() throws Exception {
-            UUID userId = UUID.randomUUID();
-            UUID otherUserId = UUID.randomUUID();
+            UserId userId = new UserId(UUID.randomUUID());
+            UserId otherUserId = new UserId(UUID.randomUUID());
             when(messageService.getMessagesByUserId(eq(otherUserId), any(Pageable.class)))
                     .thenReturn(Page.empty());
             
@@ -156,7 +157,7 @@ public class MessageControllerTests {
         @Test
         @DisplayName("Successful creation should return 201 Created with response body")
         void createMessage_Success_Returns201() throws Exception {
-            UUID userId = UUID.randomUUID();
+            UserId userId = new UserId(UUID.randomUUID());
             String content = "Test message";
             MessageRequest request = new MessageRequest(content);
             MessageResponse response = new MessageResponse(1L, content);
@@ -197,7 +198,8 @@ public class MessageControllerTests {
         @Test
         @DisplayName("Should return forbidden when there is no scope message:write with 403")
         void createMessage_NoScopeWrite_Returns403() throws Exception {
-            UUID userId = UUID.randomUUID();
+            UserId userId = new UserId(UUID.randomUUID());
+//            UUID userId = UUID.randomUUID();
             String content = "Test message";
             MessageRequest request = new MessageRequest(content);
             

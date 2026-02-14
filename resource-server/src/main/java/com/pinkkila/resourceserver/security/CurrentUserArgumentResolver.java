@@ -1,5 +1,6 @@
 package com.pinkkila.resourceserver.security;
 
+import com.pinkkila.resourceserver.userid.UserId;
 import org.jspecify.annotations.NonNull;
 import org.springframework.core.MethodParameter;
 import org.springframework.security.core.Authentication;
@@ -9,16 +10,15 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
-import java.util.UUID;
-
 public class CurrentUserArgumentResolver implements HandlerMethodArgumentResolver {
     
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
         return parameter.hasParameterAnnotation(CurrentUser.class) &&
-                parameter.getParameterType().equals(UUID.class);
+                parameter.getParameterType().equals(UserId.class);
     }
     
+    // TODO: Implement with custom claim. check: auth-server UserDetailsServiceImpl
     @Override
     public Object resolveArgument(@NonNull MethodParameter parameter,
                                   ModelAndViewContainer mavContainer,
@@ -31,6 +31,6 @@ public class CurrentUserArgumentResolver implements HandlerMethodArgumentResolve
             return null;
         }
         
-        return UUID.fromString(authentication.getName());
+        return UserId.fromString(authentication.getName());
     }
 }

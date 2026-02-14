@@ -8,3 +8,7 @@ spring:
       resourceserver:
         jwt:
           jwk-set-uri: ${mockwebserver.url}/.well-known/jwks.json
+
+logging:
+  level:
+    root: INFO

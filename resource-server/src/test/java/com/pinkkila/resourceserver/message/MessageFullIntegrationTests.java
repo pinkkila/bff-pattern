@@ -1,6 +1,7 @@
 package com.pinkkila.resourceserver.message;
 
 import com.pinkkila.resourceserver.security.JwtTestHelper;
+import com.pinkkila.resourceserver.userid.UserId;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -38,7 +39,7 @@ public class MessageFullIntegrationTests {
         @Test
         @DisplayName("Should return successfully Page of Messages with 200")
         void getMessages_SuccessDefault_Returns200() throws Exception {
-            UUID userId = UUID.randomUUID();
+            UserId userId = new UserId(UUID.randomUUID());
             messageRepository.save(new Message(null, "Test Message", userId));
             String token = JwtTestHelper.generateToken(userId.toString(), List.of("message:read"));
             
@@ -58,7 +59,7 @@ public class MessageFullIntegrationTests {
         @Test
         @DisplayName("Should return successfully requested message with 200")
         void getMessage_Success_Returns200() throws Exception {
-            UUID userId = UUID.randomUUID();
+            UserId userId = new UserId(UUID.randomUUID());
             Message savedMessage = messageRepository.save(new Message(null, "Test Message", userId));
             String token = JwtTestHelper.generateToken(userId.toString(), List.of("message:read"));
             
@@ -72,8 +73,8 @@ public class MessageFullIntegrationTests {
         @Test
         @DisplayName("Should return MessageNotFound when userId is wrong with 404")
         void getMessage_WrongUserId_Returns404() throws Exception {
-            UUID userId = UUID.randomUUID();
-            UUID otherUserId = UUID.randomUUID();
+            UserId userId = new UserId(UUID.randomUUID());
+            UserId otherUserId = new UserId(UUID.randomUUID());
             Message savedMessage = messageRepository.save(new Message(null, "Test Message", otherUserId));
             String token = JwtTestHelper.generateToken(userId.toString(), List.of("message:read"));
             
