@@ -9,7 +9,6 @@ spring:
     init:
       mode: always
 
-
   security:
     oauth2:
       authorizationserver:
@@ -23,7 +22,6 @@ spring:
               authorization-grant-types:
                 - "authorization_code"
                 - "refresh_token"
-                - "client_credentials"
               redirect-uris:
                 - "http://127.0.0.1:8080/login/oauth2/code/messaging-client-oidc"
                 - "http://127.0.0.1:8080/authorized"
@@ -32,8 +30,8 @@ spring:
               scopes:
                 - "openid"
                 - "profile"
-                - "message.read"
-                - "message.write"
+                - "message:read"
+                - "message:write"
             require-authorization-consent: true
 
 management:
@@ -45,3 +43,4 @@ management:
 logging:
   level:
     org.springframework.security: trace
+    org.springframework.web: trace

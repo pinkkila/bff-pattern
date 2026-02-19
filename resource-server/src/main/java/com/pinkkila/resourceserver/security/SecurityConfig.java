@@ -9,6 +9,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.web.SecurityFilterChain;
 
 import static org.springframework.security.config.Customizer.withDefaults;
+import static org.springframework.security.oauth2.core.authorization.OAuth2AuthorizationManagers.hasScope;
 
 @EnableWebSecurity
 @Configuration(proxyBeanMethods = false)
@@ -19,8 +20,8 @@ public class SecurityConfig {
         // @formatter:off
         http
                 .authorizeHttpRequests((authorize) -> authorize
-                        .requestMatchers(HttpMethod.GET, "/messages", "/messages/**").hasAuthority("SCOPE_message:read")
-                        .requestMatchers(HttpMethod.POST, "/messages").hasAuthority("SCOPE_message:write")
+                        .requestMatchers(HttpMethod.GET, "/messages", "/messages/**").access(hasScope("message:read"))
+                        .requestMatchers(HttpMethod.POST, "/messages").access(hasScope("message:write"))
                         .anyRequest().authenticated()
                 )
                 .csrf(AbstractHttpConfigurer::disable)
