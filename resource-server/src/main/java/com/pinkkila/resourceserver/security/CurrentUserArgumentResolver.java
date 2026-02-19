@@ -5,6 +5,7 @@ import org.jspecify.annotations.NonNull;
 import org.springframework.core.MethodParameter;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
@@ -18,7 +19,6 @@ public class CurrentUserArgumentResolver implements HandlerMethodArgumentResolve
                 parameter.getParameterType().equals(UserId.class);
     }
     
-    // TODO: Implement with custom claim. check: auth-server UserDetailsServiceImpl
     @Override
     public Object resolveArgument(@NonNull MethodParameter parameter,
                                   ModelAndViewContainer mavContainer,
@@ -27,10 +27,14 @@ public class CurrentUserArgumentResolver implements HandlerMethodArgumentResolve
         
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         
-        if (authentication == null || authentication.getName() == null) {
-            return null;
+        if (authentication instanceof JwtAuthenticationToken jwtToken) {
+            String userId = jwtToken.getTokenAttributes().get("user_id").toString();
+            if (userId != null) {
+                return UserId.fromString(userId);
+            }
         }
         
-        return UserId.fromString(authentication.getName());
+        return null;
+        
     }
 }

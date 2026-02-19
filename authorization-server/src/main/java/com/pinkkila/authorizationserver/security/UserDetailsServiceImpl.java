@@ -44,11 +44,10 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             return ROLE_USER;
         }
         
-        // TODO: Implement with custom claim. chekc resouce-server CurrentUserArgumentResolver
         @Override
         @NonNull
         public String getUsername() {
-            return getId().toString(); // Returns the UUID as the "name"
+            return super.getUsername();
         }
         
     }
