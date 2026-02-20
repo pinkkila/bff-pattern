@@ -6,13 +6,11 @@ import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
-import lombok.extern.slf4j.Slf4j;
 
 import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.core.env.PropertySource;
 
-@Slf4j
 public class MockWebServerPropertySource extends PropertySource<MockWebServer> implements DisposableBean {
     
     public static final String MOCK_WEB_SERVER_PROPERTY_SOURCE_NAME = "mockwebserver";
@@ -30,8 +28,6 @@ public class MockWebServerPropertySource extends PropertySource<MockWebServer> i
         if (!name.equals(NAME)) {
             return null;
         }
-        
-        log.trace("Looking up the url for '{}'", name);
         
         return getUrl();
     }
