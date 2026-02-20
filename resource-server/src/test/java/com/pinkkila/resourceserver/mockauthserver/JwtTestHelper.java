@@ -1,4 +1,4 @@
-package com.pinkkila.resourceserver.security;
+package com.pinkkila.resourceserver.mockauthserver;
 
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSHeader;

@@ -1,4 +1,4 @@
-package com.pinkkila.resourceserver.security;
+package com.pinkkila.resourceserver.mockauthserver;
 
 import java.io.IOException;
 
@@ -6,20 +6,18 @@ import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.core.env.PropertySource;
 
+@Slf4j
 public class MockWebServerPropertySource extends PropertySource<MockWebServer> implements DisposableBean {
     
     public static final String MOCK_WEB_SERVER_PROPERTY_SOURCE_NAME = "mockwebserver";
     
     private static final String NAME = "mockwebserver.url";
-    
-    private static final Log logger = LogFactory.getLog(MockWebServerPropertySource.class);
     
     private volatile boolean started;
     
@@ -32,9 +30,9 @@ public class MockWebServerPropertySource extends PropertySource<MockWebServer> i
         if (!name.equals(NAME)) {
             return null;
         }
-        if (logger.isTraceEnabled()) {
-            logger.trace("Looking up the url for '" + name + "'");
-        }
+        
+        log.trace("Looking up the url for '{}'", name);
+        
         return getUrl();
     }
     

@@ -1,4 +1,4 @@
-package com.pinkkila.resourceserver.security;
+package com.pinkkila.resourceserver.mockauthserver;
 
 import org.springframework.boot.EnvironmentPostProcessor;
 import org.springframework.boot.SpringApplication;

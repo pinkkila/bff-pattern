@@ -1,6 +1,6 @@
 package com.pinkkila.resourceserver.message;
 
-import com.pinkkila.resourceserver.security.JwtTestHelper;
+import com.pinkkila.resourceserver.mockauthserver.JwtTestHelper;
 import com.pinkkila.resourceserver.userid.UserId;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
