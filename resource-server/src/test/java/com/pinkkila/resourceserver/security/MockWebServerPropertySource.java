@@ -9,6 +9,7 @@ import okhttp3.mockwebserver.RecordedRequest;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.core.env.PropertySource;
 
@@ -61,6 +62,7 @@ public class MockWebServerPropertySource extends PropertySource<MockWebServer> i
         }
         Dispatcher dispatcher = new Dispatcher() {
             @Override
+            @NonNull
             public MockResponse dispatch(RecordedRequest request) {
                 if ("/.well-known/jwks.json".equals(request.getPath())) {
                     // Return the public part of the dynamic key

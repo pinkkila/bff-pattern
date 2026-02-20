@@ -78,7 +78,8 @@ public class MessageControllerTests {
             
             mockMvc.perform(get("/messages")
                             .with(jwt()
-                                    .jwt((jwt) -> jwt.subject(userId.toString())
+                                    .jwt((jwt) -> jwt
+                                            .claim("user_id", userId.toString())
                                             .claim("scope", "message:read")
                                     )
                             ))
@@ -104,7 +105,8 @@ public class MessageControllerTests {
             UserId userId = new UserId(UUID.randomUUID());
             mockMvc.perform(get("/messages")
                             .with(jwt()
-                                    .jwt((jwt) -> jwt.subject(userId.toString())
+                                    .jwt((jwt) -> jwt
+                                            .claim("user_id", userId.toString())
                                     )
                             ))
 //                    .andDo(print())
@@ -136,7 +138,8 @@ public class MessageControllerTests {
             
             mockMvc.perform(get("/messages")
                             .with(jwt()
-                                    .jwt(jwt -> jwt.subject(otherUserId.toString())
+                                    .jwt(jwt -> jwt
+                                            .claim("user_id", otherUserId.toString())
                                             .claim("scope", "message:read")
                                     )
                             ))
@@ -166,7 +169,8 @@ public class MessageControllerTests {
             
             mockMvc.perform(post("/messages")
                             .with(jwt()
-                                    .jwt(jwt -> jwt.subject(userId.toString())
+                                    .jwt(jwt -> jwt
+                                            .claim("user_id", userId.toString())
                                             .claim("scope", "message:write")
                                     )
                             )
@@ -205,7 +209,8 @@ public class MessageControllerTests {
             
             mockMvc.perform(post("/messages")
                             .with(jwt()
-                                    .jwt((jwt) -> jwt.subject(userId.toString())
+                                    .jwt(jwt -> jwt
+                                            .claim("user_id", userId.toString())
                                     )
                             )
                             .contentType(MediaType.APPLICATION_JSON)

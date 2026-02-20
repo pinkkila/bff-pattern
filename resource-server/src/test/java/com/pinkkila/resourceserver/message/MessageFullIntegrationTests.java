@@ -41,7 +41,7 @@ public class MessageFullIntegrationTests {
         void getMessages_SuccessDefault_Returns200() throws Exception {
             UserId userId = new UserId(UUID.randomUUID());
             messageRepository.save(new Message(null, "Test Message", userId));
-            String token = JwtTestHelper.generateToken(userId.toString(), List.of("message:read"));
+            String token = JwtTestHelper.generateToken(userId.toString(), List.of("message:read"), userId);
             
             webTestClient.get()
                     .uri("/messages")
@@ -61,7 +61,7 @@ public class MessageFullIntegrationTests {
         void getMessage_Success_Returns200() throws Exception {
             UserId userId = new UserId(UUID.randomUUID());
             Message savedMessage = messageRepository.save(new Message(null, "Test Message", userId));
-            String token = JwtTestHelper.generateToken(userId.toString(), List.of("message:read"));
+            String token = JwtTestHelper.generateToken(userId.toString(), List.of("message:read"), userId);
             
             webTestClient.get()
                     .uri("/messages/" + savedMessage.getId())
@@ -76,7 +76,7 @@ public class MessageFullIntegrationTests {
             UserId userId = new UserId(UUID.randomUUID());
             UserId otherUserId = new UserId(UUID.randomUUID());
             Message savedMessage = messageRepository.save(new Message(null, "Test Message", otherUserId));
-            String token = JwtTestHelper.generateToken(userId.toString(), List.of("message:read"));
+            String token = JwtTestHelper.generateToken(userId.toString(), List.of("message:read"), userId);
             
             webTestClient.get()
                     .uri("/messages/" + savedMessage.getId())
