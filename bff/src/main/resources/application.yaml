@@ -1,3 +1,54 @@
+server:
+  port: 8080
+
 spring:
   application:
     name: bff
+
+  security:
+    oauth2:
+      client:
+        registration:
+          bff-client:
+            provider: authorization-server
+            client-id: bff-client-id
+            client-secret: secret
+            authorization-grant-type: authorization_code
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+            scope: openid profile message:read message:write
+            client-name: "BFF Pattern Application"
+        provider:
+          authorization-server:
+            issuer-uri: http://localhost:9000
+
+  cloud:
+    gateway:
+      server:
+        webmvc:
+          routes:
+            - id: userinfo
+              uri: http://localhost:9000
+              predicates:
+                - Path=/userinfo
+              filters:
+                - TokenRelay=
+            - id: resource-server
+              uri: http://localhost:8090
+              predicates:
+                - Path=/api/**
+              filters:
+                - StripPrefix=1
+                - TokenRelay=
+
+app:
+  base-uri: http://localhost:5173
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+
+logging:
+  level:
+    org.springframework.security: trace
