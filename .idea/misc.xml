@@ -3,6 +3,7 @@
   <component name="ExternalStorageConfigurationManager" enabled="true" />
   <component name="FrameworkDetectionExcludesConfiguration">
     <file type="web" url="file://$PROJECT_DIR$/authorization-server" />
+    <file type="web" url="file://$PROJECT_DIR$/bff" />
     <file type="web" url="file://$PROJECT_DIR$/resource-server" />
   </component>
   <component name="ProjectRootManager" version="2">

@@ -27,8 +27,12 @@ of truth. Follow them strictly when generating, modifying, or refactoring code.
 bff-pattern
 ├── authorization-server
 │   └── 
-└── resource-server
-    └── 
+├── bff
+│   └── 
+├── resource-server
+│   └── 
+└── spa
+    └──
 ```
 
 ### Spring Boot applications
