@@ -13,9 +13,9 @@ spring:
     oauth2:
       authorizationserver:
         client:
-          messaging-client:
+          bff-client:
             registration:
-              client-id: "messaging-client"
+              client-id: "bff-client-id"
               client-secret: "{noop}secret"
               client-authentication-methods:
                 - "client_secret_basic"
@@ -23,8 +23,7 @@ spring:
                 - "authorization_code"
                 - "refresh_token"
               redirect-uris:
-                - "http://127.0.0.1:8080/login/oauth2/code/messaging-client-oidc"
-                - "http://127.0.0.1:8080/authorized"
+                - "http://localhost:8080/login/oauth2/code/bff-client"
               post-logout-redirect-uris:
                 - "http://127.0.0.1:8080/logged-out"
               scopes:

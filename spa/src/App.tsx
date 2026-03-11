@@ -5,6 +5,13 @@ function App() {
   return (
     <>
       <h1>Vite + React</h1>
+      <button
+        onClick={() =>
+          (window.location.href = "http://localhost:8080/oauth2/authorization/bff-client")
+        }
+      >
+        Login
+      </button>
       <Footer />
     </>
   );
