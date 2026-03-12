@@ -24,6 +24,12 @@ import org.springframework.security.web.csrf.CsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 import org.springframework.security.web.util.matcher.MediaTypeRequestMatcher;
 
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.List;
+
 @Configuration(proxyBeanMethods = false)
 @EnableWebSecurity
 public class SecurityConfig {
@@ -47,7 +53,7 @@ public class SecurityConfig {
                                 .csrfTokenRepository(cookieCsrfTokenRepository)
                                 .csrfTokenRequestHandler(csrfTokenRequestAttributeHandler)
                 )
-//                .cors(Customizer.withDefaults())
+                .cors(Customizer.withDefaults())
                 .exceptionHandling(exceptionHandling ->
                         exceptionHandling
                                 .authenticationEntryPoint(authenticationEntryPoint())
@@ -81,6 +87,6 @@ public class SecurityConfig {
                 new SecurityContextLogoutHandler(),
                 new CsrfLogoutHandler(csrfTokenRepository));
     }
-    
+
 }
 

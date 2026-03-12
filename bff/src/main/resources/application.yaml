@@ -1,5 +1,10 @@
 server:
   port: 8080
+  servlet:
+    session:
+      cookie:
+        name: SESSION_BFF
+        same-site: lax
 
 spring:
   application:
