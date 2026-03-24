@@ -21,7 +21,7 @@ of truth. Follow them strictly when generating, modifying, or refactoring code.
 
 ## Project Structure
 
-- This project is a monorepo (bff-pattern) currently including two Spring Boot applications:
+- This project is a monorepo including three Spring Boot applications (authorization-server, bff, resource-server) and a single React Vite app (spa):
 
 ```
 bff-pattern
