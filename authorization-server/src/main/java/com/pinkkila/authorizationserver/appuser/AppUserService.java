@@ -17,4 +17,15 @@ public class AppUserService {
 //        AppUser newUser = AppUser.create(username, passwordEncoder.encode(rawPassword));
         return userRepository.save(newUser).getId();
     }
+    
+//    public void changePassword(UserId userId, String newRawPassword) {
+//        AppUser user = userRepository.findById(userId)
+//                .orElseThrow(() -> new UserNotFoundException(userId));
+//
+//        // Create the updated instance
+//        AppUser updatedUser = user.withPassword(passwordEncoder.encode(newRawPassword));
+//
+//        // Save the new instance (Spring Data JDBC performs an UPDATE)
+//        userRepository.save(updatedUser);
+//    }
 }
