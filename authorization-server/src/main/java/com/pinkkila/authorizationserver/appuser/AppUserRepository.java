@@ -1,10 +1,10 @@
 package com.pinkkila.authorizationserver.appuser;
 
+import com.pinkkila.authorizationserver.userid.UserId;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.Optional;
-import java.util.UUID;
 
-public interface AppUserRepository extends CrudRepository<AppUser, UUID> {
+public interface AppUserRepository extends CrudRepository<AppUser, UserId> {
     Optional<AppUser> findByUsername(String username);
 }

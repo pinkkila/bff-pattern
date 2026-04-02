@@ -57,3 +57,6 @@ management:
 logging:
   level:
     org.springframework.security: trace
+#    org.springframework.cloud.gateway: trace
+    org.springframework.web: trace
+#    org.springframework.web.servlet: trace
