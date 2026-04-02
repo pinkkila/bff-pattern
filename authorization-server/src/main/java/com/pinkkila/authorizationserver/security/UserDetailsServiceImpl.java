@@ -2,6 +2,7 @@ package com.pinkkila.authorizationserver.security;
 
 import com.pinkkila.authorizationserver.appuser.AppUser;
 import com.pinkkila.authorizationserver.appuser.AppUserRepository;
+import com.pinkkila.authorizationserver.userid.UserId;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NonNull;
 import org.springframework.security.core.GrantedAuthority;
@@ -29,13 +30,18 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                 .orElseThrow(() -> new UsernameNotFoundException("username " + username + " is not found"));
     }
     
-    static final class CustomUserDetails extends AppUser implements UserDetails {
+    static final class CustomUserDetails implements UserDetails {
+        private final AppUser appUser;
         
         private static final List<GrantedAuthority> ROLE_USER = Collections
                 .unmodifiableList(AuthorityUtils.createAuthorityList("ROLE_USER"));
         
         CustomUserDetails(AppUser appUser) {
-            super(appUser.getId(), appUser.getUsername(), appUser.getPassword());
+            this.appUser = appUser;
+        }
+        
+        public UserId getId() {
+            return appUser.getId();
         }
         
         @Override
@@ -46,8 +52,14 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         
         @Override
         @NonNull
+        public String getPassword() {
+            return appUser.getPassword();
+        }
+        
+        @Override
+        @NonNull
         public String getUsername() {
-            return super.getUsername();
+            return appUser.getUsername();
         }
         
     }
