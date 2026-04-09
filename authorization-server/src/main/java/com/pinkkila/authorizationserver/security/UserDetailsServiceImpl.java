@@ -40,6 +40,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             this.appUser = appUser;
         }
         
+        @NonNull
         public UserId getId() {
             return appUser.getId();
         }

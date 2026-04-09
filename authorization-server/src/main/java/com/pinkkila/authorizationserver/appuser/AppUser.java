@@ -47,6 +47,7 @@ public class AppUser implements Persistable<UserId> {
     }
     
     @Override
+    @NonNull
     public UserId getId() {
         return id;
     }

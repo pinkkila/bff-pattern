@@ -1,5 +1,6 @@
 package com.pinkkila.authorizationserver.appuser;
 
+import com.pinkkila.authorizationserver.appuser.exception.AppUserNotFoundException;
 import com.pinkkila.authorizationserver.userid.UserId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,6 +17,15 @@ public class AppUserService {
         AppUser newUser = AppUser.create(username, "{noop}" + rawPassword);
 //        AppUser newUser = AppUser.create(username, passwordEncoder.encode(rawPassword));
         return userRepository.save(newUser).getId();
+    }
+    
+        public void changeUsername(UserId userId, String newUsername) {
+        AppUser user = userRepository.findById(userId)
+                .orElseThrow(() -> new AppUserNotFoundException("UserNotFound"));
+
+        AppUser updatedUser = user.withUsername(newUsername);
+
+        userRepository.save(updatedUser);
     }
     
 //    public void changePassword(UserId userId, String newRawPassword) {
