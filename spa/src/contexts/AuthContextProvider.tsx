@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import * as React from "react";
 import { AuthContext } from "./AuthContext";
-import { getUserinfo } from "../lib/queries.ts";
+import { getUserinfo, logoutRequest } from "../lib/queries.ts";
 
 export default function AuthContextProvider({children}: {children: React.ReactNode}) {
   const [data, setData] = useState<{ sub: string } | null>(null);
@@ -12,7 +12,7 @@ export default function AuthContextProvider({children}: {children: React.ReactNo
         const userData = await getUserinfo();
         setData(userData);
       } catch (error) {
-        // console.error("Auth initialization error:", error);
+        console.info("Auth initialization:", error);
         setData(null);
       }
     };
@@ -20,8 +20,12 @@ export default function AuthContextProvider({children}: {children: React.ReactNo
     fetchUserInfo();
   }, [])
 
+  const logout = async () => {
+    logoutRequest()
+    setData(null)
+  }
 
   return (
-    <AuthContext.Provider value={{username: data?.sub ?? null}}>{children}</AuthContext.Provider>
+    <AuthContext.Provider value={{username: data?.sub ?? null, logout}}>{children}</AuthContext.Provider>
   );
 }
