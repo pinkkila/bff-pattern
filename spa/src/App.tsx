@@ -14,7 +14,7 @@ function App() {
       <Login />
       {username && <p>Welcome, {username}!</p>}
       {username && <MessageList />}
-      <MessageForm />
+      {username && <MessageForm />}
       <Footer />
     </>
   );

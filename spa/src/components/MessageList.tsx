@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import type { TMessage } from "../lib/types.ts";
 import { getMessages } from "../lib/queries.ts";
+import Message from "./Message.tsx";
 
 export default function MessageList() {
   const [messages, setMessages] = useState<TMessage[]>([]);
@@ -22,7 +23,7 @@ export default function MessageList() {
       {messages.length === 0 && <p>No messages yet.</p>}
       <ul>
         {messages.map((message) => (
-          <li key={message.id}>{message.content}</li>
+          <Message message={message} />
         ))}
       </ul>
     </>
