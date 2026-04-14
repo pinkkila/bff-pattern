@@ -2,20 +2,28 @@ import type { TMessage } from "../lib/types.ts";
 import { deleteMessage, updateMessage } from "../lib/queries.ts";
 import { useState } from "react";
 
-export default function Message({ message }: { message: TMessage }) {
+type MessageProps = {
+  message: TMessage;
+  fetchMessages: () => void;
+}
+
+export default function Message({ message, fetchMessages }: MessageProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [content, setContent] = useState(message.content);
 
   const handleUpdate = async () => {
     try {
-      // TMessageRequest expects { content: string }
       await updateMessage(message.id, { content });
       setIsEditing(false);
-      // Optional: Refresh the page or trigger a re-fetch in the parent component
-      // window.location.reload();
+      fetchMessages();
     } catch (error) {
       console.error("Failed to update message:", error);
     }
+  };
+
+  const handleDelete = async () => {
+    await deleteMessage(message.id);
+    fetchMessages(); // Refresh the list
   };
 
   if (isEditing) {
@@ -32,7 +40,7 @@ export default function Message({ message }: { message: TMessage }) {
     <li key={message.id}>
       <p>{message.content}</p>
       <button onClick={() => setIsEditing(true)}>Edit</button>
-      <button onClick={() => deleteMessage(message.id)}>Delete</button>
+      <button onClick={handleDelete}>Delete</button>
     </li>
   );
 }
