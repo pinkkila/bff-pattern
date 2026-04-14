@@ -37,6 +37,21 @@ public class MessageService {
         return mapToResponse(messageRepository.save(message));
     }
     
+    @Transactional
+    public MessageResponse updateMessage(Long id, UserId userId, MessageRequest messageRequest) {
+        Message message = messageRepository.findByIdAndUserId(id, userId)
+                .orElseThrow(() -> new MessageNotFound("Message not found with id: " + id));
+        message.setContent(messageRequest.content());
+        return mapToResponse(messageRepository.save(message));
+    }
+    
+    @Transactional
+    public void deleteMessageByIdAndUserId(Long id, UserId userId) {
+        Message message = messageRepository.findByIdAndUserId(id, userId)
+                .orElseThrow(() -> new MessageNotFound("Message not found with id: " + id));
+        messageRepository.delete(message);
+    }
+    
     private MessageResponse mapToResponse(Message message) {
         return new MessageResponse(message.getId(), message.getContent());
     }

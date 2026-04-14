@@ -40,4 +40,16 @@ public class MessageController {
         return ResponseEntity.created(locationOfCreatedMessage).body(createdMessage);
     }
     
+    @PutMapping("/{id}")
+    public ResponseEntity<MessageResponse> updateMessage(@CurrentUser UserId userId, @PathVariable Long id, @RequestBody @Valid MessageRequest messageRequest) {
+        MessageResponse updatedMessage = messageService.updateMessage(id, userId, messageRequest);
+        return ResponseEntity.ok(updatedMessage);
+    }
+    
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteMessage(@CurrentUser UserId userId, @PathVariable Long id) {
+        messageService.deleteMessageByIdAndUserId(id, userId);
+        return ResponseEntity.noContent().build();
+    }
+    
 }
