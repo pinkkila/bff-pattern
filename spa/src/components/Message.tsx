@@ -1,36 +1,39 @@
 import type { TMessage } from "../lib/types.ts";
 import { deleteMessage, updateMessage } from "../lib/queries.ts";
 import { useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 type MessageProps = {
   message: TMessage;
-  fetchMessages: () => void;
 }
 
-export default function Message({ message, fetchMessages }: MessageProps) {
+export default function Message({ message }: MessageProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [content, setContent] = useState(message.content);
 
-  const handleUpdate = async () => {
-    try {
-      await updateMessage(message.id, { content });
-      setIsEditing(false);
-      fetchMessages();
-    } catch (error) {
-      console.error("Failed to update message:", error);
-    }
-  };
+  const queryClient = useQueryClient();
 
-  const handleDelete = async () => {
-    await deleteMessage(message.id);
-    fetchMessages(); // Refresh the list
-  };
+  const updateMutation = useMutation({
+    mutationFn: (newContent: string) =>
+      updateMessage(message.id, { content: newContent }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["messages"] });
+      setIsEditing(false);
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: () => deleteMessage(message.id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["messages"] });
+    },
+  });
 
   if (isEditing) {
     return (
       <li key={message.id}>
         <input value={content} onChange={(e) => setContent(e.target.value)} />
-        <button onClick={handleUpdate}>Save</button>
+        <button onClick={() => updateMutation.mutate(content)}>Save</button>
         <button onClick={() => setIsEditing(false)}>Cancel</button>
       </li>
     );
@@ -40,7 +43,7 @@ export default function Message({ message, fetchMessages }: MessageProps) {
     <li key={message.id}>
       <p>{message.content}</p>
       <button onClick={() => setIsEditing(true)}>Edit</button>
-      <button onClick={handleDelete}>Delete</button>
+      <button onClick={() => deleteMutation.mutate()}>Delete</button>
     </li>
   );
 }

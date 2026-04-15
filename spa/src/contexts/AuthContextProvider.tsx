@@ -1,31 +1,50 @@
-import { useEffect, useState } from "react";
 import * as React from "react";
 import { AuthContext } from "./AuthContext";
 import { getUserinfo, logoutRequest } from "../lib/queries.ts";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-export default function AuthContextProvider({children}: {children: React.ReactNode}) {
-  const [data, setData] = useState<{ sub: string } | null>(null);
+export default function AuthContextProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const queryClient = useQueryClient();
 
-  useEffect(() => {
-    const fetchUserInfo = async () => {
-      try {
-        const userData = await getUserinfo();
-        setData(userData);
-      } catch (error) {
-        console.info("Auth initialization:", error);
-        setData(null);
-      }
-    };
+  const { data, isPending } = useQuery({
+    queryKey: ["auth", "userinfo"],
+    queryFn: getUserinfo,
+    retry: false,
+    staleTime: Infinity,
+  });
 
-    fetchUserInfo();
-  }, [])
+  const { mutate: logout, isPending: logoutIsPending } = useMutation({
+    mutationFn: logoutRequest,
+    onMutate: async () => {
+      await queryClient.cancelQueries({ queryKey: ["auth", "userinfo"] });
+      queryClient.setQueryData(["auth", "userinfo"], null);
+    },
+    onSuccess: () => {
+      queryClient.removeQueries({ queryKey: ["auth"] });
+      queryClient.removeQueries({ queryKey: ["messages"] });
 
-  const logout = async () => {
-    logoutRequest()
-    setData(null)
-  }
+      // TODO: Add toaster?
+    },
+    onError: (error) => {
+      console.error("Logout failed:", error);
+      // TODO: Add toaster?
+    },
+  });
 
   return (
-    <AuthContext.Provider value={{username: data?.sub ?? null, logout}}>{children}</AuthContext.Provider>
+    <AuthContext.Provider
+      value={{
+        username: data?.sub ?? null,
+        isPending,
+        logout,
+        logoutIsPending,
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
   );
 }

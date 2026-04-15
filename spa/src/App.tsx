@@ -5,35 +5,31 @@ import { useAuthContext } from "./hooks/use-auth.ts";
 import MessageList from "./components/MessageList.tsx";
 import MessageForm from "./components/MessageForm.tsx";
 import { getMessages } from "./lib/queries.ts";
-import { useEffect, useState } from "react";
-import type { TMessage } from "./lib/types.ts";
+import { useQuery } from "@tanstack/react-query";
 
 function App() {
-  const { username } = useAuthContext();
-  const [messages, setMessages] = useState<TMessage[]>([]);
+  const { username, isPending: usernameIsPending } = useAuthContext();
 
-  const fetchMessages = async () => {
-    try {
-      const messagesPage = await getMessages();
-      setMessages(messagesPage.content);
-    } catch (error) {
-      console.error("Error fetching messages:", error);
-    }
-  };
-
-  useEffect(() => {
-    if (username) {
-      fetchMessages();
-    }
-  }, [username]);
+  const { data: messagePage, isLoading, isError } = useQuery({
+    queryKey: ["messages"],
+    queryFn: getMessages,
+    enabled: !!username && !usernameIsPending,
+  });
 
   return (
     <>
       <h1>BFF Pattern</h1>
       <Login />
       {username && <p>Welcome, {username}!</p>}
-      {username && <MessageList messages={messages} fetchMessages={fetchMessages} />}
-      {username && <MessageForm fetchMessages={fetchMessages} />}
+
+      {username && isLoading && <p>Loading...</p>}
+      {username && isError && <p>Error loading messages</p>}
+
+      {username && messagePage && (
+        <MessageList messages={messagePage.content}
+        />
+      )}
+      {username && <MessageForm />}
       <Footer />
     </>
   );
