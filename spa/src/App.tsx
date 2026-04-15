@@ -17,7 +17,7 @@ export default function App() {
         <h1>BFF Pattern</h1>
         <Login />
       </div>
-      {user ? <MessageBoard user={user} /> : <p>Please log in.</p>}
+      {user ? <MessageBoard user={user} /> : <p className="please-login">Please login.</p>}
       <Footer />
     </>
   );

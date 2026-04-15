@@ -21,6 +21,12 @@
   padding: 1rem;
 }
 
+.please-login {
+  font-size: 2rem;
+  text-align: center;
+  padding: 8rem;
+}
+
 .footer {
   margin-top: auto;
   padding-top: 2rem;
