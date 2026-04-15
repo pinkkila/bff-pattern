@@ -1,7 +1,8 @@
 import { createContext } from "react";
+import type { TUser } from "../lib/types.ts";
 
 export type TAuthContext = {
-  username: string | null;
+  user: TUser | null;
   isPending: boolean;
   logout: () => void;
   logoutIsPending: boolean;

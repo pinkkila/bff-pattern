@@ -1,3 +1,7 @@
+export type TUser = {
+  username: string;
+}
+
 export type TMessage = {
   id: number;
   content: string;

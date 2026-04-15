@@ -10,7 +10,7 @@ export default function AuthContextProvider({
 }) {
   const queryClient = useQueryClient();
 
-  const { data, isPending } = useQuery({
+  const { data: user, isPending } = useQuery({
     queryKey: ["auth", "userinfo"],
     queryFn: getUserinfo,
     retry: false,
@@ -26,19 +26,16 @@ export default function AuthContextProvider({
     onSuccess: () => {
       queryClient.removeQueries({ queryKey: ["auth"] });
       queryClient.removeQueries({ queryKey: ["messages"] });
-
-      // TODO: Add toaster?
     },
     onError: (error) => {
       console.error("Logout failed:", error);
-      // TODO: Add toaster?
     },
   });
 
   return (
     <AuthContext.Provider
       value={{
-        username: data?.sub ?? null,
+        user: user ?? null,
         isPending,
         logout,
         logoutIsPending,

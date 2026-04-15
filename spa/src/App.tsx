@@ -8,28 +8,28 @@ import { getMessages } from "./lib/queries.ts";
 import { useQuery } from "@tanstack/react-query";
 
 function App() {
-  const { username, isPending: usernameIsPending } = useAuthContext();
+  const { user, isPending: userIsPending } = useAuthContext();
 
   const { data: messagePage, isLoading, isError } = useQuery({
     queryKey: ["messages"],
     queryFn: getMessages,
-    enabled: !!username && !usernameIsPending,
+    enabled: !!user && !userIsPending,
   });
 
   return (
     <>
       <h1>BFF Pattern</h1>
       <Login />
-      {username && <p>Welcome, {username}!</p>}
+      {user && <p>Welcome, {user.username}!</p>}
 
-      {username && isLoading && <p>Loading...</p>}
-      {username && isError && <p>Error loading messages</p>}
+      {user && isLoading && <p>Loading...</p>}
+      {user && isError && <p>Error loading messages</p>}
 
-      {username && messagePage && (
+      {user && messagePage && (
         <MessageList messages={messagePage.content}
         />
       )}
-      {username && <MessageForm />}
+      {user && <MessageForm />}
       <Footer />
     </>
   );

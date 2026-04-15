@@ -1,19 +1,27 @@
 import { getCsrfToken } from "./utils.ts";
-import type { TMessageRequest, TMessagesPage } from "./types.ts";
+import type { TMessageRequest, TMessagesPage, TUser } from "./types.ts";
 
 const BFF_URL = "http://localhost:8080";
 
-export async function getUserinfo(): Promise<{ sub: string }> {
+export async function getUserinfo(): Promise<TUser | null> {
   const response = await fetch(`${BFF_URL}/userinfo`, {
     credentials: "include",
     headers: {
       Accept: "application/json",
     },
   });
-  if (!response.ok) {
-    throw new Error(`Not authenticated. ${response.statusText}`);
+
+  if (response.status === 401) {
+    return null;
   }
-  return await response.json();
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch userinfo: ${response.statusText}`);
+  }
+
+  const data = await response.json();
+
+  return { username: data.sub };
 }
 
 export async function logoutRequest() {
@@ -59,11 +67,16 @@ export async function createMessage(messageRequest: TMessageRequest) {
   });
 
   if (!response.ok) {
-    throw new Error("Something went wrong, when creating new message. " + response.statusText);
+    throw new Error(
+      "Something went wrong, when creating new message. " + response.statusText,
+    );
   }
 }
 
-export async function updateMessage(id: number, messageRequest: TMessageRequest) {
+export async function updateMessage(
+  id: number,
+  messageRequest: TMessageRequest,
+) {
   const csrfToken = getCsrfToken();
 
   const response = await fetch(`${BFF_URL}/api/messages/${id}`, {
@@ -74,10 +87,12 @@ export async function updateMessage(id: number, messageRequest: TMessageRequest)
       ...(csrfToken ? { "X-XSRF-TOKEN": csrfToken } : {}),
     },
     body: JSON.stringify(messageRequest),
-  })
+  });
 
   if (!response.ok) {
-    throw new Error("Something went wrong, when updating message. " + response.statusText);
+    throw new Error(
+      "Something went wrong, when updating message. " + response.statusText,
+    );
   }
 }
 
@@ -94,6 +109,8 @@ export async function deleteMessage(id: number) {
   });
 
   if (!response.ok) {
-    throw new Error("Something went wrong, when deleting message. " + response.statusText);
+    throw new Error(
+      "Something went wrong, when deleting message. " + response.statusText,
+    );
   }
 }
