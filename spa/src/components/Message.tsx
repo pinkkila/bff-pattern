@@ -31,33 +31,79 @@ export default function Message({ message }: MessageProps) {
 
   const isPending = updateIsPending || deleteIsPending;
 
-  if (isEditing) {
-    return (
-      <li>
-        <input
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          disabled={isPending}
-        />
-        <button onClick={() => update(content)} disabled={isPending}>
-          {updateIsPending ? "Saving..." : "Save"}
-        </button>
-        <button onClick={() => setIsEditing(false)} disabled={isPending}>
-          Cancel
-        </button>
-      </li>
-    );
-  }
-
   return (
     <li>
-      <p>{message.content}</p>
-      <button onClick={() => setIsEditing(true)} disabled={isPending}>
+      {isEditing ? (
+        <MessageEdit
+          content={content}
+          setContent={setContent}
+          onSave={() => update(content)}
+          onCancel={() => {
+            setIsEditing(false);
+            setContent(message.content);
+          }}
+          isPending={isPending}
+          updateIsPending={updateIsPending}
+        />
+      ) : (
+        <MessageView
+          content={message.content}
+          onEdit={() => setIsEditing(true)}
+          onDelete={() => remove()}
+          isPending={isPending}
+          deleteIsPending={deleteIsPending}
+        />
+      )}
+    </li>
+  );
+}
+
+type MessageViewProps = {
+  content: string;
+  onEdit: () => void;
+  onDelete: () => void;
+  isPending: boolean;
+  deleteIsPending: boolean;
+};
+
+function MessageView({ content, onEdit, onDelete, isPending, deleteIsPending }: MessageViewProps) {
+  return (
+    <>
+      <p>{content}</p>
+      <button onClick={onEdit} disabled={isPending}>
         Edit
       </button>
-      <button onClick={() => remove()} disabled={isPending}>
+      <button onClick={onDelete} disabled={isPending}>
         {deleteIsPending ? "Deleting..." : "Delete"}
       </button>
-    </li>
+    </>
+  );
+}
+
+type MessageEditProps = {
+  content: string;
+  setContent: (value: string) => void;
+  onSave: () => void;
+  onCancel: () => void;
+  isPending: boolean;
+  updateIsPending: boolean;
+};
+
+function MessageEdit({ content, setContent, onSave, onCancel, isPending, updateIsPending }: MessageEditProps) {
+  return (
+    <>
+      <input
+        value={content}
+        onChange={(e) => setContent(e.target.value)}
+        disabled={isPending}
+        autoFocus
+      />
+      <button onClick={onSave} disabled={isPending || !content.trim()}>
+        {updateIsPending ? "Saving..." : "Save"}
+      </button>
+      <button onClick={onCancel} disabled={isPending}>
+        Cancel
+      </button>
+    </>
   );
 }
