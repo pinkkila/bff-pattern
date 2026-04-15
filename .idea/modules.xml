@@ -6,7 +6,6 @@
       <module fileurl="file://$PROJECT_DIR$/bff-pattern.iml" filepath="$PROJECT_DIR$/bff-pattern.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/bff.main.iml" filepath="$PROJECT_DIR$/.idea/modules/bff.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/resource-server.main.iml" filepath="$PROJECT_DIR$/.idea/modules/resource-server.main.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/resource-server.test.iml" filepath="$PROJECT_DIR$/.idea/modules/resource-server.test.iml" />
       <module fileurl="file://$PROJECT_DIR$/spa/spa.iml" filepath="$PROJECT_DIR$/spa/spa.iml" />
     </modules>
   </component>

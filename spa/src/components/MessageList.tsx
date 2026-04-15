@@ -11,7 +11,7 @@ export default function MessageList({ messages }: MessageListProps) {
       {messages.length === 0 && <p>No messages yet.</p>}
       <ul>
         {messages.map((message) => (
-          <Message message={message} />
+          <Message key={message.id} message={message} />
         ))}
       </ul>
     </>

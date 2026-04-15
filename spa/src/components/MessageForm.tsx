@@ -1,37 +1,40 @@
-import { useState } from "react";
+import { type SyntheticEvent, useState } from "react";
 import { createMessage } from "../lib/queries.ts";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { TMessageRequest } from "../lib/types.ts";
 
 export default function MessageForm() {
   const [message, setMessage] = useState("");
   const queryClient = useQueryClient();
 
-  const {
-    mutate,
-    // isPending: createMessageIsPending,
-    // isError: createMessageIsError,
-  } = useMutation({
-    mutationFn: (messageRequest: TMessageRequest) =>
-      createMessage(messageRequest),
+  const { mutate, isPending: createMessageIsPending } = useMutation({
+    mutationFn: createMessage,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["messages"] });
+      setMessage("");
+    },
+    onError: (error) => {
+      console.error("Failed to create message:", error);
     },
   });
 
-  const handleSubmit = () => {
+  const handleSubmit = (e: SyntheticEvent) => {
+    e.preventDefault();
     mutate({ content: message });
   };
 
   return (
-    <form>
+    <form onSubmit={handleSubmit}>
       <input
         type="text"
         value={message}
         onChange={(e) => setMessage(e.target.value)}
+        disabled={createMessageIsPending}
       />
-      <button type="submit" onClick={handleSubmit}>
-        Send
+      <button
+        type="submit"
+        disabled={createMessageIsPending || !message.trim()}
+      >
+        {createMessageIsPending ? "Sending..." : "Send"}
       </button>
     </form>
   );
