@@ -32,7 +32,7 @@ export default function Message({ message }: MessageProps) {
   const isPending = updateIsPending || deleteIsPending;
 
   return (
-    <li>
+    <li className="message">
       {isEditing ? (
         <MessageEdit
           content={content}
@@ -70,12 +70,14 @@ function MessageView({ content, onEdit, onDelete, isPending, deleteIsPending }: 
   return (
     <>
       <p>{content}</p>
-      <button onClick={onEdit} disabled={isPending}>
-        Edit
-      </button>
-      <button onClick={onDelete} disabled={isPending}>
-        {deleteIsPending ? "Deleting..." : "Delete"}
-      </button>
+      <div className="actions">
+        <button onClick={onEdit} disabled={isPending}>
+          Edit
+        </button>
+        <button onClick={onDelete} disabled={isPending}>
+          {deleteIsPending ? "Deleting..." : "Delete"}
+        </button>
+      </div>
     </>
   );
 }
@@ -98,12 +100,14 @@ function MessageEdit({ content, setContent, onSave, onCancel, isPending, updateI
         disabled={isPending}
         autoFocus
       />
-      <button onClick={onSave} disabled={isPending || !content.trim()}>
-        {updateIsPending ? "Saving..." : "Save"}
-      </button>
-      <button onClick={onCancel} disabled={isPending}>
-        Cancel
-      </button>
+      <div className="actions">
+        <button onClick={onSave} disabled={isPending || !content.trim()}>
+          {updateIsPending ? "Saving..." : "Save"}
+        </button>
+        <button onClick={onCancel} disabled={isPending}>
+          Cancel
+        </button>
+      </div>
     </>
   );
 }

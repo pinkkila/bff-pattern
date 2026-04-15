@@ -6,7 +6,7 @@ export default function LoginButton() {
   };
 
   return (
-    <button onClick={handleLogin}>
+    <button onClick={handleLogin} className="login-btn">
       Login
     </button>
   );

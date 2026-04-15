@@ -2,7 +2,7 @@
 function Footer() {
   return (
     <div className="footer">
-      <p>Footer content</p>
+      <p>BFF Pattern</p>
     </div>
   );
 }

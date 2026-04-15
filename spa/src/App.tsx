@@ -13,8 +13,10 @@ export default function App() {
 
   return (
     <>
-      <h1>BFF Pattern</h1>
-      <Login />
+      <div className="header">
+        <h1>BFF Pattern</h1>
+        <Login />
+      </div>
       {user ? <MessageBoard user={user} /> : <p>Please log in.</p>}
       <Footer />
     </>

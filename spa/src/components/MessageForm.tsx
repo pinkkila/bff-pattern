@@ -23,7 +23,7 @@ export default function MessageForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} className="message-form">
       <input
         type="text"
         value={message}

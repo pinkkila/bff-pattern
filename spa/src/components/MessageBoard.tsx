@@ -17,7 +17,7 @@ export default function MessageBoard({ user }: MessageBoardProps) {
 
   return (
     <main>
-      <p>Welcome, {user.username}!</p>
+      <p className="welcome">Welcome, {user.username}!</p>
 
       {isLoading && <p>Loading messages...</p>}
       {isError && <p>Error loading messages. Please try again later.</p>}

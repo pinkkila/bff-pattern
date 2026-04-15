@@ -5,5 +5,5 @@ import LoginButton from "./LoginButton.tsx";
 export default function Login() {
   const { user } = useAuthContext();
 
-  return <section>{user ? <LogoutButton /> : <LoginButton />}</section>;
+  return <>{user ? <LogoutButton /> : <LoginButton />}</>;
 }
