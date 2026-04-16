@@ -2,6 +2,7 @@ server:
   port: 9000
   servlet:
     session:
+      timeout: 12h
       cookie:
         name: SESSION_AUTH
         same-site: lax

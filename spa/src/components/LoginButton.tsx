@@ -1,4 +1,5 @@
-const LOGIN_URL = "http://localhost:8080/oauth2/authorization/bff-client";
+// const LOGIN_URL = "http://localhost:8080/oauth2/authorization/bff-client"; // don't use this, check DelegatingAuthenticationEntryPoint in bff
+const LOGIN_URL = "http://localhost:8080";
 
 export default function LoginButton() {
   const handleLogin = () => {

@@ -2,6 +2,7 @@ server:
   port: 8080
   servlet:
     session:
+      timeout: 30m
       cookie:
         name: SESSION_BFF
         same-site: lax

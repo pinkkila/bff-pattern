@@ -14,7 +14,7 @@ export default function AuthContextProvider({
     queryKey: ["auth", "userinfo"],
     queryFn: getUserinfo,
     retry: false,
-    staleTime: Infinity,
+    staleTime: 1000 * 60 * 30,
   });
 
   const { mutate: logout, isPending: logoutIsPending } = useMutation({
