@@ -8,6 +8,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.DelegatingAuthenticationEntryPoint;
@@ -21,12 +22,6 @@ import org.springframework.security.web.authentication.logout.SecurityContextLog
 import org.springframework.security.web.csrf.*;
 import org.springframework.security.web.util.matcher.MediaTypeRequestMatcher;
 
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-
-import java.util.List;
-
 @Configuration(proxyBeanMethods = false)
 @EnableWebSecurity
 public class SecurityConfig {
@@ -36,21 +31,13 @@ public class SecurityConfig {
     
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) {
-        CookieCsrfTokenRepository cookieCsrfTokenRepository = CookieCsrfTokenRepository.withHttpOnlyFalse();
-        XorCsrfTokenRequestAttributeHandler delegate = new XorCsrfTokenRequestAttributeHandler();
-        delegate.setCsrfRequestAttributeName(null);
-        CsrfTokenRequestHandler requestHandler = delegate::handle;
         // @formatter:off
         http
                 .authorizeHttpRequests(authorize ->
                         authorize
                                 .anyRequest().authenticated()
                 )
-                .csrf(csrf ->
-                        csrf
-                                .csrfTokenRepository(cookieCsrfTokenRepository)
-                                .csrfTokenRequestHandler(requestHandler)
-                )
+                .csrf(CsrfConfigurer::spa)
                 .cors(Customizer.withDefaults())
                 .exceptionHandling(exceptionHandling ->
                         exceptionHandling
@@ -61,7 +48,7 @@ public class SecurityConfig {
                                 .successHandler(new SimpleUrlAuthenticationSuccessHandler(this.appBaseUri)))
                 .logout(logout ->
                         logout
-                                .addLogoutHandler(logoutHandler(cookieCsrfTokenRepository))
+                                .addLogoutHandler(new SecurityContextLogoutHandler())
                                 .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler(HttpStatus.OK))
                 )
                 .oauth2Client(Customizer.withDefaults());
