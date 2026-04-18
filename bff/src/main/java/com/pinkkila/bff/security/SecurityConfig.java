@@ -18,10 +18,7 @@ import org.springframework.security.web.authentication.logout.CompositeLogoutHan
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
-import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
-import org.springframework.security.web.csrf.CsrfLogoutHandler;
-import org.springframework.security.web.csrf.CsrfTokenRepository;
-import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
+import org.springframework.security.web.csrf.*;
 import org.springframework.security.web.util.matcher.MediaTypeRequestMatcher;
 
 import org.springframework.web.cors.CorsConfiguration;
@@ -40,8 +37,9 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) {
         CookieCsrfTokenRepository cookieCsrfTokenRepository = CookieCsrfTokenRepository.withHttpOnlyFalse();
-        CsrfTokenRequestAttributeHandler csrfTokenRequestAttributeHandler = new CsrfTokenRequestAttributeHandler();
-        csrfTokenRequestAttributeHandler.setCsrfRequestAttributeName(null);
+        XorCsrfTokenRequestAttributeHandler delegate = new XorCsrfTokenRequestAttributeHandler();
+        delegate.setCsrfRequestAttributeName(null);
+        CsrfTokenRequestHandler requestHandler = delegate::handle;
         // @formatter:off
         http
                 .authorizeHttpRequests(authorize ->
@@ -51,7 +49,7 @@ public class SecurityConfig {
                 .csrf(csrf ->
                         csrf
                                 .csrfTokenRepository(cookieCsrfTokenRepository)
-                                .csrfTokenRequestHandler(csrfTokenRequestAttributeHandler)
+                                .csrfTokenRequestHandler(requestHandler)
                 )
                 .cors(Customizer.withDefaults())
                 .exceptionHandling(exceptionHandling ->
