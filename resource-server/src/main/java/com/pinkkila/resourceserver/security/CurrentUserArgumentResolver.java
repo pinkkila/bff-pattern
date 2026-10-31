@@ -28,7 +28,7 @@ public class CurrentUserArgumentResolver implements HandlerMethodArgumentResolve
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         
         if (authentication instanceof JwtAuthenticationToken jwtToken) {
-            String userId = jwtToken.getTokenAttributes().get("user_id").toString();
+            String userId = jwtToken.getToken().getClaimAsString("user_id");
             if (userId != null) {
                 return UserId.fromString(userId);
             }
