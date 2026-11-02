@@ -26,8 +26,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -215,6 +217,125 @@ public class MessageControllerTests {
                             )
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request))
+                    )
+                    .andExpect(status().isForbidden());
+            
+            verifyNoInteractions(messageService);
+        }
+        
+    }
+    
+    @Nested
+    @DisplayName("PUT /messages/{id}")
+    class PutMessageTests {
+        
+        @Test
+        @DisplayName("Successful update should return 200 with response body")
+        void updateMessage_Success_Returns200() throws Exception {
+            UserId userId = new UserId(UUID.randomUUID());
+            String content = "Updated message";
+            MessageRequest request = new MessageRequest(content);
+            MessageResponse response = new MessageResponse(1L, content);
+            
+            when(messageService.updateMessage(eq(1L), eq(userId), eq(request))).thenReturn(response);
+            
+            mockMvc.perform(put("/messages/1")
+                            .with(jwt()
+                                    .jwt(jwt -> jwt
+                                            .claim("user_id", userId.toString())
+                                            .claim("scope", "message:write")
+                                    )
+                            )
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request))
+                    )
+                    .andExpect(status().isOk())
+                    .andExpect(content().json(objectMapper.writeValueAsString(response), JsonCompareMode.STRICT));
+            
+            verify(messageService).updateMessage(eq(1L), eq(userId), eq(request));
+        }
+        
+        @Test
+        @DisplayName("Should return unauthenticated when there is no JWT with 401")
+        void updateMessage_NoJwt_Returns401() throws Exception {
+            MessageRequest request = new MessageRequest("Updated message");
+            
+            mockMvc.perform(put("/messages/1")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request))
+                    )
+                    .andExpect(status().isUnauthorized());
+            
+            verifyNoInteractions(messageService);
+        }
+        
+        @Test
+        @DisplayName("Should return forbidden when there is no scope message:write with 403")
+        void updateMessage_NoScopeWrite_Returns403() throws Exception {
+            UserId userId = new UserId(UUID.randomUUID());
+            MessageRequest request = new MessageRequest("Updated message");
+            
+            mockMvc.perform(put("/messages/1")
+                            .with(jwt()
+                                    .jwt(jwt -> jwt
+                                            .claim("user_id", userId.toString())
+                                            .claim("scope", "message:read")
+                                    )
+                            )
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request))
+                    )
+                    .andExpect(status().isForbidden());
+            
+            verifyNoInteractions(messageService);
+        }
+        
+    }
+    
+    @Nested
+    @DisplayName("DELETE /messages/{id}")
+    class DeleteMessageTests {
+        
+        @Test
+        @DisplayName("Successful deletion should return 204 No Content")
+        void deleteMessage_Success_Returns204() throws Exception {
+            UserId userId = new UserId(UUID.randomUUID());
+            
+            mockMvc.perform(delete("/messages/1")
+                            .with(jwt()
+                                    .jwt(jwt -> jwt
+                                            .claim("user_id", userId.toString())
+                                            .claim("scope", "message:write")
+                                    )
+                            )
+                    )
+                    .andExpect(status().isNoContent());
+            
+            verify(messageService).deleteMessageByIdAndUserId(eq(1L), eq(userId));
+        }
+        
+        @Test
+        @DisplayName("Should return unauthenticated when there is no JWT with 401")
+        void updateMessage_NoJwt_Returns401() throws Exception {
+            
+            mockMvc.perform(delete("/messages/1"))
+                    .andExpect(status().isUnauthorized());
+            
+            verifyNoInteractions(messageService);
+        }
+        
+        @Test
+        @DisplayName("Should return forbidden when there is no scope message:write with 403")
+        void deleteMessage_NoScopeWrite_Returns403() throws Exception {
+            UserId userId = new UserId(UUID.randomUUID());
+            
+            mockMvc.perform(delete("/messages/1")
+                            .with(jwt()
+                                    .jwt(jwt -> jwt
+                                            .claim("user_id", userId.toString())
+                                            .claim("scope", "message:read")
+                                    )
+                            )
                     )
                     .andExpect(status().isForbidden());
             

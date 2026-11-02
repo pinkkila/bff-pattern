@@ -23,6 +23,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests((authorize) -> authorize
                         .requestMatchers(HttpMethod.GET, "/messages", "/messages/**").access(hasScope("message:read"))
                         .requestMatchers(HttpMethod.POST, "/messages").access(hasScope("message:write"))
+                        .requestMatchers(HttpMethod.PUT, "/messages/**").access(hasScope("message:write"))
+                        .requestMatchers(HttpMethod.DELETE, "/messages/**").access(hasScope("message:write"))
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
