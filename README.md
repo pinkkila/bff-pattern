@@ -1,10 +1,10 @@
 # BFF Pattern
 
 A full-stack implementation of the Backend for Frontend (BFF) pattern, built to the requirements of
-[RFC 10017](https://www.rfc-editor.org/rfc/rfc10017.txt), the IETF's Best Current Practice for OAuth 2.0 in
-browser-based apps. A React single-page app signs users in with OAuth 2.0 and OpenID Connect, but no token ever
-reaches the browser. A Spring Boot BFF keeps the tokens on the server, and the browser only gets an `HttpOnly`
-session cookie.
+[RFC 10017](https://datatracker.ietf.org/doc/html/draft-ietf-oauth-browser-based-apps), the IETF's Best Current Practice
+for OAuth 2.0 in browser-based apps. A React single-page app signs users in with OAuth 2.0 and OpenID Connect, but no
+token ever reaches the browser. A Spring Boot BFF keeps the tokens on the server, and the browser only gets an
+`HttpOnly` session cookie.
 
 The project covers the whole OAuth setup, not just the client. The authorization server, the BFF and the resource
 server are three separate Spring Boot services, so login isn't handed off to a hosted identity provider. A small
@@ -15,12 +15,12 @@ This project is part of my [thesis](https://www.theseus.fi/items/241cb384-f10b-4
 
 **Tech stack**
 
-| Area             | Technologies                                                                                                          |
-|------------------|-----------------------------------------------------------------------------------------------------------------------|
-| Backend          | Java 21, Spring Boot, Spring Security, Spring Authorization Server, Spring Cloud Gateway Server MVC, Spring Data JDBC |
-| Frontend         | React, TypeScript, Vite, TanStack Query                                                                               |
-| Data and tooling | PostgreSQL, Docker Compose, Gradle, pnpm                                                                              |
-| Testing          | JUnit, Mockito, MockMvc, WebTestClient, Testcontainers, MockWebServer                                                 |
+| Area             | Technologies                                                                                                       |
+|------------------|--------------------------------------------------------------------------------------------------------------------|
+| Backend          | Java, Spring Boot, Spring Security, Spring Authorization Server, Spring Cloud Gateway Server MVC, Spring Data JDBC |
+| Frontend         | React, TypeScript, Vite, TanStack Query                                                                            |
+| Data and tooling | PostgreSQL, Docker Compose, Gradle, pnpm                                                                           |
+| Testing          | JUnit, Mockito, MockMvc, WebTestClient, Testcontainers, MockWebServer                                              |
 
 **What this project shows**
 
