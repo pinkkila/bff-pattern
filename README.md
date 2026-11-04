@@ -15,12 +15,12 @@ This project is part of my [thesis](https://www.theseus.fi/items/241cb384-f10b-4
 
 **Tech stack**
 
-| Area             | Technologies                                                                                                                      |
-|------------------|-----------------------------------------------------------------------------------------------------------------------------------|
-| Backend          | Java 21, Spring Boot 4.0, Spring Security 7.0, Spring Authorization Server, Spring Cloud Gateway Server MVC 5.0, Spring Data JDBC |
-| Frontend         | React 19, TypeScript 5.9, Vite 7, TanStack Query 5                                                                                |
-| Data and tooling | PostgreSQL 18, Docker Compose, Gradle, pnpm                                                                                       |
-| Testing          | JUnit, Mockito, MockMvc, WebTestClient, Testcontainers, MockWebServer                                                             |
+| Area             | Technologies                                                                                                          |
+|------------------|-----------------------------------------------------------------------------------------------------------------------|
+| Backend          | Java 21, Spring Boot, Spring Security, Spring Authorization Server, Spring Cloud Gateway Server MVC, Spring Data JDBC |
+| Frontend         | React, TypeScript, Vite, TanStack Query                                                                               |
+| Data and tooling | PostgreSQL, Docker Compose, Gradle, pnpm                                                                              |
+| Testing          | JUnit, Mockito, MockMvc, WebTestClient, Testcontainers, MockWebServer                                                 |
 
 **What this project shows**
 
