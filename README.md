@@ -142,6 +142,39 @@ Section 6.1 of the RFC lists requirements for a BFF. This is how the project com
   ordinary [TanStack Query](spa/src/contexts/AuthContextProvider.tsx) query, and logout clears the cached user and
   messages.
 
+## Running locally
+
+**Prerequisites:** JDK 21, Docker, Node.js 20.19 or later, and pnpm.
+
+Each service runs in its own terminal. Start them in this order, because the BFF reads the authorization server's
+configuration at startup. Spring Boot's Docker Compose support starts PostgreSQL from [`compose.yaml`](compose.yaml)
+automatically.
+
+```bash
+# 1. Authorization server, port 9000
+cd authorization-server && ./gradlew bootRun
+
+# 2. Resource server, port 8090
+cd resource-server && ./gradlew bootRun
+
+# 3. BFF, port 8080
+cd bff && ./gradlew bootRun
+
+# 4. SPA, port 5173
+cd spa && pnpm install && pnpm dev
+```
+
+Open http://localhost:5173 and sign in as `user` with the password `password`. Use `localhost`, not `127.0.0.1`.
+CORS only allows `http://localhost:5173`, and the cookies depend on every service being on the same site.
+
+### Running the tests
+
+```bash
+cd <service> && ./gradlew test
+```
+
+The authorization server and resource server tests use Testcontainers, so Docker has to be running.
+
 ## Known limitations
 
 This is a local development setup. Before production I would change the following:

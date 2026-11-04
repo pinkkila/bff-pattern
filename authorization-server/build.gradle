@@ -55,3 +55,8 @@ dependencies {
 tasks.named('test') {
     useJUnitPlatform()
 }
+
+// compose.yaml is in the repository root, not in this project's directory
+tasks.named('bootRun') {
+    systemProperty 'spring.docker.compose.file', file('../compose.yaml').absolutePath
+}
