@@ -24,8 +24,6 @@ export async function getUserinfo(): Promise<TUser | null> {
   return { username: data.sub };
 }
 
-// Ends the BFF session and returns the authorization server's logout URL. The browser has to navigate
-// there too, or the authorization server session would sign the user in again without a password.
 export async function logoutRequest(): Promise<string> {
   const csrfToken = getCsrfToken();
 

@@ -82,9 +82,6 @@ class LogoutTests {
         assertThat(this.authorizedClientRepository).isInstanceOf(HttpSessionOAuth2AuthorizedClientRepository.class);
     }
 
-    /**
-     * A logout request as the SPA sends it: the CSRF token from the XSRF-TOKEN cookie in the X-XSRF-TOKEN header.
-     */
     private static MockHttpServletRequestBuilder logoutRequest() {
         return post("/logout")
                 .cookie(new Cookie("XSRF-TOKEN", CSRF_TOKEN))
@@ -97,10 +94,6 @@ class LogoutTests {
                 .idToken(idToken -> idToken.tokenValue(idTokenValue));
     }
 
-    /**
-     * Replaces the client registration that Spring Boot would build from the authorization server's discovery
-     * document, so that the tests don't need a running authorization server.
-     */
     @TestConfiguration
     static class ClientRegistrationConfig {
 

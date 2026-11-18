@@ -57,10 +57,6 @@ public class SecurityConfig {
         return http.build();
     }
 
-    /**
-     * Keeps the tokens in the HTTP session, so they are removed when the session ends at logout or expiry.
-     * Spring Boot's default keeps them in memory by user name, where they outlive the session.
-     */
     @Bean
     public OAuth2AuthorizedClientRepository authorizedClientRepository() {
         return new HttpSessionOAuth2AuthorizedClientRepository();
@@ -76,12 +72,6 @@ public class SecurityConfig {
                 .build();
     }
 
-    /**
-     * OIDC RP-initiated logout. Ending the BFF session is not enough, because the authorization server session
-     * would still sign the user in again without a password. The browser also has to visit the authorization
-     * server's end_session_endpoint. The SPA logs out with fetch, which can't follow a cross-origin redirect as a
-     * page navigation, so the URL is returned in the Location header of a 202 response and the SPA navigates to it.
-     */
     private LogoutSuccessHandler oidcLogoutSuccessHandler(ClientRegistrationRepository clientRegistrationRepository) {
         OidcClientInitiatedLogoutSuccessHandler handler =
                 new OidcClientInitiatedLogoutSuccessHandler(clientRegistrationRepository);

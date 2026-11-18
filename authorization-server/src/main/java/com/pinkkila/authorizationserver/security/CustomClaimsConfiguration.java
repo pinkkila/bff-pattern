@@ -18,8 +18,6 @@ public class CustomClaimsConfiguration {
             @Value("${app.access-token-audience}") String accessTokenAudience) {
         return (context) -> {
             if (OAuth2TokenType.ACCESS_TOKEN.equals(context.getTokenType())) {
-                // Restricts the access token to the resource server (RFC 9700, section 2.3). Spring's default
-                // audience is the client ID, which ID tokens also carry.
                 context.getClaims().audience(List.of(accessTokenAudience));
                 Authentication authentication = context.getPrincipal();
                 if (authentication.getPrincipal() instanceof UserDetailsServiceImpl.CustomUserDetails user) {
