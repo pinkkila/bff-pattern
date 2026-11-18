@@ -1,10 +1,11 @@
 # BFF Pattern
 
 A full-stack implementation of the Backend for Frontend (BFF) pattern, built to the requirements of
-[RFC 10017](https://datatracker.ietf.org/doc/html/draft-ietf-oauth-browser-based-apps), the IETF's Best Current Practice
-for OAuth 2.0 in browser-based apps. A React single-page app signs users in with OAuth 2.0 and OpenID Connect, but no
-token ever reaches the browser. A Spring Boot BFF keeps the tokens on the server, and the browser only gets an
-`HttpOnly` session cookie.
+[RFC 10017](https://datatracker.ietf.org/doc/html/rfc10017), the IETF's Best Current Practice for OAuth 2.0 in
+browser-based apps. A React single-page app signs users in with OAuth 2.0 and OpenID Connect, but the access and refresh
+tokens never reach the browser. A Spring Boot BFF keeps them on the server, and the browser authenticates with an
+`HttpOnly` session cookie. The only token the browser sees is the ID token, which it passes to the authorization server
+at logout.
 
 The project covers the whole OAuth setup, not just the client. The authorization server, the BFF and the resource
 server are three separate Spring Boot services, so login isn't handed off to a hosted identity provider. A small
@@ -33,7 +34,7 @@ flowchart LR
     RS["Resource server<br/>messages REST API"]
     DB[("PostgreSQL")]
     Browser -- " session cookie and CSRF token " --> BFF
-    Browser -. " login and consent redirects " .-> AS
+    Browser -. " login, consent and logout redirects " .-> AS
     BFF -- " code exchange, token refresh, userinfo " --> AS
     BFF -- " Bearer access token " --> RS
     RS -. " public signing keys (JWKS) " .-> AS
@@ -43,9 +44,9 @@ flowchart LR
 
 | Service                                        | Port | Responsibility                                                                                                                                         |
 |------------------------------------------------|------|--------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [`spa`](spa)                                   | 5173 | React UI. Holds no tokens and calls the BFF with `credentials: "include"`.                                                                             |
+| [`spa`](spa)                                   | 5173 | React UI. Holds no access or refresh tokens and calls the BFF with `credentials: "include"`.                                                           |
 | [`bff`](bff)                                   | 8080 | Confidential OAuth client and API gateway. Keeps the tokens server-side, relays the access token on proxied requests and refreshes it when it expires. |
-| [`authorization-server`](authorization-server) | 9000 | Handles login and consent, and issues signed JWTs with a custom `user_id` claim.                                                                       |
+| [`authorization-server`](authorization-server) | 9000 | Handles login, consent and logout, and issues signed JWTs with a custom `user_id` claim.                                                               |
 | [`resource-server`](resource-server)           | 8090 | Stateless REST API. Validates JWTs, including their issuer and audience, checks scopes and limits each user to their own data.                         |
 
 ### Login flow
@@ -102,12 +103,12 @@ authorization server accepts the refresh token until it expires.
 
 ### Session lifetimes
 
-| What                                | Lifetime                          |
-|-------------------------------------|-----------------------------------|
-| BFF session                         | 30 minutes since the last request |
-| Authorization server login session  | 12 hours since the last request   |
-| Access token                        | 5 minutes                         |
-| Refresh token                       | 60 minutes from login             |
+| What                               | Lifetime                                   |
+|------------------------------------|--------------------------------------------|
+| BFF session                        | 30 minutes since the last request          |
+| Authorization server login session | 12 hours since the browser last visited it |
+| Access token                       | 5 minutes                                  |
+| Refresh token                      | 60 minutes from login                      |
 
 Spring Authorization Server reuses the same refresh token on every refresh, so its expiry doesn't move. An active user
 stays signed in for about an hour. After that the authorization server rejects the refresh token, and the BFF ends its
@@ -169,7 +170,9 @@ CORS only allows `http://localhost:5173`, and the cookies depend on every servic
 cd <service> && ./gradlew test
 ```
 
-The authorization server and resource server tests use Testcontainers, so Docker has to be running. The bff need authorization server running.
+The authorization server and resource server tests use Testcontainers, so Docker has to be running. The BFF's
+`BffApplicationTests` needs the authorization server running, because it reads the authorization server's configuration
+at startup. The other BFF tests don't.
 
 ## Known limitations
 
