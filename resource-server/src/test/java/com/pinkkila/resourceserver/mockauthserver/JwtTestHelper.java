@@ -17,7 +17,10 @@ import java.util.List;
 public class JwtTestHelper {
     
     public static final String DEFAULT_ISSUER = "http://mock-auth-server";
-    
+
+    // The audience the resource server accepts, set in application.yaml
+    public static final String DEFAULT_AUDIENCE = "http://localhost:8090";
+
     // Generate a pair once for the entire test session
     public static final RSAKey RSA_KEY = generate();
     
@@ -36,11 +39,17 @@ public class JwtTestHelper {
     }
     
     public static String generateToken(String subject, List<String> scopes, String issuer, UserId userIdValue) throws Exception {
+        return generateToken(subject, scopes, issuer, List.of(DEFAULT_AUDIENCE), userIdValue);
+    }
+
+    public static String generateToken(String subject, List<String> scopes, String issuer, List<String> audience,
+                                       UserId userIdValue) throws Exception {
         RSASSASigner signer = new RSASSASigner(RSA_KEY);
-        
+
         JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
                 .subject(subject)
                 .issuer(issuer)
+                .audience(audience)
                 .claim("scope", String.join(" ", scopes))
                 .claim("user_id", userIdValue.toString())
                 .expirationTime(new Date(new Date().getTime() + 60 * 1000))

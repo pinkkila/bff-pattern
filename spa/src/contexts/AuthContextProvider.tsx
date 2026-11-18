@@ -23,9 +23,11 @@ export default function AuthContextProvider({
       await queryClient.cancelQueries({ queryKey: ["auth", "userinfo"] });
       queryClient.setQueryData(["auth", "userinfo"], null);
     },
-    onSuccess: () => {
+    onSuccess: (logoutUrl) => {
       queryClient.removeQueries({ queryKey: ["auth"] });
       queryClient.removeQueries({ queryKey: ["messages"] });
+      // The authorization server ends its session and redirects back to the SPA
+      window.location.assign(logoutUrl);
     },
     onError: (error) => {
       console.error("Logout failed:", error);

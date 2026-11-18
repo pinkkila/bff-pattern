@@ -22,6 +22,8 @@ public class CorsConfig {
         CorsConfiguration config = new CorsConfiguration();
         config.addAllowedHeader("X-XSRF-TOKEN");
         config.addAllowedHeader(HttpHeaders.CONTENT_TYPE);
+        // The logout response gives the SPA the authorization server's logout URL in this header
+        config.addExposedHeader(HttpHeaders.LOCATION);
         config.setAllowedMethods(Arrays.asList("GET", "HEAD", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedOrigins(Collections.singletonList(this.appBaseUri));
         config.setAllowCredentials(true);

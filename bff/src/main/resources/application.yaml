@@ -55,9 +55,9 @@ management:
       exposure:
         include: health
 
-logging:
-  level:
-    org.springframework.security: trace
+#logging:
+#  level:
+#    org.springframework.security: trace
 #    org.springframework.cloud.gateway: trace
-    org.springframework.web: trace
+#    org.springframework.web: trace
 #    org.springframework.web.servlet: trace

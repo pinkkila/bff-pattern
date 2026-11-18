@@ -24,7 +24,9 @@ export async function getUserinfo(): Promise<TUser | null> {
   return { username: data.sub };
 }
 
-export async function logoutRequest() {
+// Ends the BFF session and returns the authorization server's logout URL. The browser has to navigate
+// there too, or the authorization server session would sign the user in again without a password.
+export async function logoutRequest(): Promise<string> {
   const csrfToken = getCsrfToken();
 
   const response = await fetch(`${BFF_URL}/logout`, {
@@ -39,6 +41,13 @@ export async function logoutRequest() {
   if (!response.ok) {
     throw new Error(`Logout failed: ${response.statusText}`);
   }
+
+  const logoutUrl = response.headers.get("Location");
+  if (!logoutUrl) {
+    throw new Error("Logout failed: the response has no logout URL");
+  }
+
+  return logoutUrl;
 }
 
 export async function getMessages(): Promise<TMessagesPage> {

@@ -46,7 +46,7 @@ flowchart LR
 | [`spa`](spa)                                   | 5173 | React UI. Holds no tokens and calls the BFF with `credentials: "include"`.                                                                             |
 | [`bff`](bff)                                   | 8080 | Confidential OAuth client and API gateway. Keeps the tokens server-side, relays the access token on proxied requests and refreshes it when it expires. |
 | [`authorization-server`](authorization-server) | 9000 | Handles login and consent, and issues signed JWTs with a custom `user_id` claim.                                                                       |
-| [`resource-server`](resource-server)           | 8090 | Stateless REST API. Validates JWTs, checks scopes and limits each user to their own data.                                                              |
+| [`resource-server`](resource-server)           | 8090 | Stateless REST API. Validates JWTs, including their issuer and audience, checks scopes and limits each user to their own data.                         |
 
 ### Login flow
 
@@ -73,6 +73,32 @@ sequenceDiagram
 
 Access tokens live for five minutes. When one expires, the BFF gets a new one with the refresh token, and the SPA
 doesn't notice.
+
+### Logout flow
+
+Logout has to end two sessions: the BFF session and the authorization server's login session. If only the BFF session
+ended, the authorization server would sign the user straight back in without a password. The BFF uses
+[OpenID Connect RP-Initiated Logout](https://openid.net/specs/openid-connect-rpinitiated-1_0.html).
+
+```mermaid
+sequenceDiagram
+    actor Browser
+    participant BFF
+    participant AS as Authorization server
+    Browser ->> BFF: fetch POST /logout with the session cookie and CSRF token
+    Note over BFF: Ends the session, which also deletes the tokens
+    BFF -->> Browser: 202 with the authorization server's logout URL in the Location header
+    Browser ->> AS: Navigate to the logout URL, which includes the ID token
+    AS -->> Browser: End the login session and redirect to the SPA
+```
+
+The BFF returns the logout URL instead of redirecting to it, because `fetch` can't turn a cross-origin redirect into a
+page navigation. The SPA navigates to the URL itself.
+
+Logout doesn't revoke the refresh token with
+[OAuth 2.0 Token Revocation](https://datatracker.ietf.org/doc/html/rfc7009). Section 6.1.2.1 of RFC 10017 leaves the
+behavior of the logout endpoint to the application. The BFF's copy of the tokens is deleted with the session, and the
+authorization server accepts the refresh token until it expires.
 
 ## Compared with RFC 10017
 
@@ -128,13 +154,11 @@ This is a local development setup. Before production at least the following shou
 
 - **HTTPS and cookies:** Serve everything over HTTPS, then enable `Secure` and the `__Host-Http-` prefix to meet the
   remaining cookie requirements.
-- **Logout:** Logout ends the BFF session but not the authorization server session, so the next login needs no password.
-  This needs OIDC RP-initiated logout.
 - **Secrets:** The client secret is in `application.yaml` and the demo password uses `{noop}`. These belong in a secret
   store and a real password hash.
 - **In-memory state:** Sessions, OAuth authorizations and signing keys live in memory, so a restart signs users out and
   the services can't scale horizontally. Spring Session and persistent authorization storage and keys would fix this.
 - **Expired sessions in the SPA:** When a session expires, the SPA shows a generic error instead of returning to the
   logged-out view. It needs a global handler for 401 responses.
-- **Configuration:** URLs are hard-coded for localhost, and `TRACE` logging is on. Production would use external
-  configuration, and would serve the SPA from the same origin as the BFF so that CORS isn't needed.
+- **Configuration:** URLs are hard-coded for localhost. Production would use external configuration, and would serve
+  the SPA from the same origin as the BFF so that CORS isn't needed.

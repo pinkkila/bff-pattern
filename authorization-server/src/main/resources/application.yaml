@@ -18,6 +18,8 @@ spring:
   security:
     oauth2:
       authorizationserver:
+        # A fixed issuer, so the "iss" claim doesn't depend on the host name a request uses
+        issuer: http://localhost:9000
         client:
           bff-client:
             registration:
@@ -31,7 +33,7 @@ spring:
               redirect-uris:
                 - "http://localhost:8080/login/oauth2/code/bff-client"
               post-logout-redirect-uris:
-                - "http://localhost:8080/logged-out"
+                - "http://localhost:5173"
               scopes:
                 - "openid"
                 - "profile"
@@ -39,13 +41,17 @@ spring:
                 - "message:write"
             require-authorization-consent: true
 
+app:
+  # The "aud" claim of access tokens. It identifies the resource server, which only accepts tokens with this audience.
+  access-token-audience: http://localhost:8090
+
 management:
   endpoints:
     web:
       exposure:
         include: health
 
-logging:
-  level:
-    org.springframework.security: trace
-    org.springframework.web: trace
+#logging:
+#  level:
+#    org.springframework.security: trace
+#    org.springframework.web: trace

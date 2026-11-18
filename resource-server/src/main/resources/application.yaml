@@ -19,6 +19,11 @@ spring:
       resourceserver:
         jwt:
           jwk-set-uri: http://localhost:9000/oauth2/jwks
+          # Tokens are rejected unless "iss" is exactly this value. With jwk-set-uri also set, the signing keys still
+          # come from jwk-set-uri, so the authorization server doesn't have to be running at startup.
+          issuer-uri: http://localhost:9000
+          # Tokens are rejected unless "aud" contains this value (RFC 9700, section 2.3)
+          audiences: http://localhost:8090
 
   web:
     resources:
@@ -35,8 +40,8 @@ management:
       exposure:
         include: health
 
-logging:
-  level:
-    org.springframework.security: trace
+#logging:
+#  level:
+#    org.springframework.security: trace
 #    org.springframework.data: trace
 #    org.springframework.web: trace
