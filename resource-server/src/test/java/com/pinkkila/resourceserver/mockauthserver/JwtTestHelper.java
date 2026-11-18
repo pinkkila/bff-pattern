@@ -3,6 +3,7 @@ package com.pinkkila.resourceserver.mockauthserver;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSHeader;
 import com.nimbusds.jose.crypto.RSASSASigner;
+import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
@@ -33,7 +34,11 @@ public class JwtTestHelper {
             throw new RuntimeException("Failed to generate test RSA key", e);
         }
     }
-    
+
+    public static String jwkSet() {
+        return new JWKSet(RSA_KEY.toPublicJWK()).toString();
+    }
+
     public static String generateToken(String subject, List<String> scopes, UserId userIdValue) throws Exception {
         return generateToken(subject, scopes, DEFAULT_ISSUER, userIdValue);
     }

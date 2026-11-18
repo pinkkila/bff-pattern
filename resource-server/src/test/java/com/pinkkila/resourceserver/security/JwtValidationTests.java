@@ -1,8 +1,10 @@
 package com.pinkkila.resourceserver.security;
 
+import com.github.tomakehurst.wiremock.WireMockServer;
 import com.pinkkila.resourceserver.TestcontainersConfiguration;
 import com.pinkkila.resourceserver.mockauthserver.JwtTestHelper;
 import com.pinkkila.resourceserver.userid.UserId;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,10 +13,15 @@ import org.springframework.boot.webtestclient.autoconfigure.AutoConfigureWebTest
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import org.wiremock.spring.ConfigureWireMock;
+import org.wiremock.spring.EnableWireMock;
+import org.wiremock.spring.InjectWireMock;
 
 import java.util.List;
 import java.util.UUID;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
 import static com.pinkkila.resourceserver.mockauthserver.JwtTestHelper.DEFAULT_AUDIENCE;
 import static com.pinkkila.resourceserver.mockauthserver.JwtTestHelper.DEFAULT_ISSUER;
 
@@ -22,6 +29,8 @@ import static com.pinkkila.resourceserver.mockauthserver.JwtTestHelper.DEFAULT_I
 @AutoConfigureWebTestClient
 @Import(TestcontainersConfiguration.class)
 @ActiveProfiles("test")
+// Stands in for the authorization server, which publishes the key the tokens are signed with
+@EnableWireMock(@ConfigureWireMock(name = "authorization-server", baseUrlProperties = "authorization-server.url"))
 @DisplayName("JWT issuer and audience validation")
 class JwtValidationTests {
 
@@ -29,6 +38,14 @@ class JwtValidationTests {
 
     @Autowired
     private WebTestClient webTestClient;
+
+    @InjectWireMock("authorization-server")
+    private WireMockServer authorizationServer;
+
+    @BeforeEach
+    void publishSigningKey() {
+        this.authorizationServer.stubFor(get("/oauth2/jwks").willReturn(okJson(JwtTestHelper.jwkSet())));
+    }
 
     @Test
     @DisplayName("Should accept a token with the expected issuer and audience")

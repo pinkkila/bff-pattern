@@ -25,29 +25,34 @@ spring:
             client-name: "BFF Pattern Application"
         provider:
           authorization-server:
-            issuer-uri: http://localhost:9000
+            issuer-uri: ${app.authorization-server-uri}
 
   cloud:
     gateway:
       server:
         webmvc:
           routes:
+            # The browser's cookies stay at the BFF. Downstream services get only the access token.
             - id: userinfo
-              uri: http://localhost:9000
+              uri: ${app.authorization-server-uri}
               predicates:
                 - Path=/userinfo
               filters:
+                - RemoveRequestHeader=Cookie
                 - TokenRelay=
             - id: resource-server
-              uri: http://localhost:8090
+              uri: ${app.resource-server-uri}
               predicates:
                 - Path=/api/**
               filters:
+                - RemoveRequestHeader=Cookie
                 - StripPrefix=1
                 - TokenRelay=
 
 app:
   base-uri: http://localhost:5173
+  authorization-server-uri: http://localhost:9000
+  resource-server-uri: http://localhost:8090
 
 management:
   endpoints:

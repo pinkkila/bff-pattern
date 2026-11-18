@@ -1,5 +1,6 @@
 package com.pinkkila.resourceserver.message;
 
+import com.github.tomakehurst.wiremock.WireMockServer;
 import com.pinkkila.resourceserver.mockauthserver.JwtTestHelper;
 import com.pinkkila.resourceserver.userid.UserId;
 import org.junit.jupiter.api.*;
@@ -10,23 +11,38 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import com.pinkkila.resourceserver.TestcontainersConfiguration;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import org.wiremock.spring.ConfigureWireMock;
+import org.wiremock.spring.EnableWireMock;
+import org.wiremock.spring.InjectWireMock;
 
 import java.util.List;
 import java.util.UUID;
+
+import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureWebTestClient
 @Import(TestcontainersConfiguration.class)
 @ActiveProfiles("test")
+@EnableWireMock(@ConfigureWireMock(name = "authorization-server", baseUrlProperties = "authorization-server.url"))
 @DisplayName("Message Integration Tests")
 public class MessageFullIntegrationTests {
-    
+
     @Autowired
     private WebTestClient webTestClient;
-    
+
     @Autowired
     private MessageRepository messageRepository;
-    
+
+    @InjectWireMock("authorization-server")
+    private WireMockServer authorizationServer;
+
+    @BeforeEach
+    void publishSigningKey() {
+        this.authorizationServer.stubFor(get("/oauth2/jwks").willReturn(okJson(JwtTestHelper.jwkSet())));
+    }
+
     @BeforeEach
     void setUp() {
         messageRepository.deleteAll();

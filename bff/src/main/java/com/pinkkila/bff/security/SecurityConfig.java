@@ -23,6 +23,8 @@ import org.springframework.security.web.authentication.SimpleUrlAuthenticationSu
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.security.web.util.matcher.MediaTypeRequestMatcher;
 
+import java.util.Set;
+
 @Configuration(proxyBeanMethods = false)
 @EnableWebSecurity
 public class SecurityConfig {
@@ -63,10 +65,12 @@ public class SecurityConfig {
     }
 
     private AuthenticationEntryPoint authenticationEntryPoint() {
+        MediaTypeRequestMatcher htmlRequest = new MediaTypeRequestMatcher(MediaType.TEXT_HTML);
+        htmlRequest.setIgnoredMediaTypes(Set.of(MediaType.ALL));
         return DelegatingAuthenticationEntryPoint.builder()
                 .addEntryPointFor(
                         new LoginUrlAuthenticationEntryPoint("/oauth2/authorization/bff-client"),
-                        new MediaTypeRequestMatcher(MediaType.TEXT_HTML)
+                        htmlRequest
                 )
                 .defaultEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
                 .build();

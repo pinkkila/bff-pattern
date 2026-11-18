@@ -21,7 +21,7 @@ This project is part of my [thesis](https://www.theseus.fi/items/241cb384-f10b-4
 | Backend          | Java, Spring Boot, Spring Security, Spring Authorization Server, Spring Cloud Gateway Server MVC, Spring Data JDBC |
 | Frontend         | React, TypeScript, Vite, TanStack Query                                                                            |
 | Data and tooling | PostgreSQL, Docker Compose, Gradle, pnpm                                                                           |
-| Testing          | JUnit, Mockito, MockMvc, WebTestClient, Testcontainers, MockWebServer                                              |
+| Testing          | JUnit, Mockito, MockMvc, WebTestClient, Testcontainers, WireMock                                                   |
 
 
 ## Architecture
@@ -42,12 +42,12 @@ flowchart LR
     RS --> DB
 ```
 
-| Service                                        | Port | Responsibility                                                                                                                                         |
-|------------------------------------------------|------|--------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [`spa`](spa)                                   | 5173 | React UI. Holds no access or refresh tokens and calls the BFF with `credentials: "include"`.                                                           |
-| [`bff`](bff)                                   | 8080 | Confidential OAuth client and API gateway. Keeps the tokens server-side, relays the access token on proxied requests and refreshes it when it expires. |
-| [`authorization-server`](authorization-server) | 9000 | Handles login, consent and logout, and issues signed JWTs with a custom `user_id` claim.                                                               |
-| [`resource-server`](resource-server)           | 8090 | Stateless REST API. Validates JWTs, including their issuer and audience, checks scopes and limits each user to their own data.                         |
+| Service                                        | Port | Responsibility                                                                                                                                                                          |
+|------------------------------------------------|------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`spa`](spa)                                   | 5173 | React UI. Holds no access or refresh tokens and calls the BFF with `credentials: "include"`.                                                                                            |
+| [`bff`](bff)                                   | 8080 | Confidential OAuth client and API gateway. Keeps the tokens server-side, relays the access token instead of the browser's cookies on proxied requests and refreshes it when it expires. |
+| [`authorization-server`](authorization-server) | 9000 | Handles login, consent and logout, and issues signed JWTs with a custom `user_id` claim.                                                                                                |
+| [`resource-server`](resource-server)           | 8090 | Stateless REST API. Validates JWTs, including their issuer and audience, checks scopes and limits each user to their own data.                                                          |
 
 ### Login flow
 
@@ -170,9 +170,8 @@ CORS only allows `http://localhost:5173`, and the cookies depend on every servic
 cd <service> && ./gradlew test
 ```
 
-The authorization server and resource server tests use Testcontainers, so Docker has to be running. The BFF's
-`BffApplicationTests` needs the authorization server running, because it reads the authorization server's configuration
-at startup. The other BFF tests don't.
+The authorization server and resource server tests use Testcontainers, so Docker has to be running. The BFF tests
+don't need Docker or the other services.
 
 ## Known limitations
 
