@@ -100,6 +100,29 @@ Logout doesn't revoke the refresh token with
 behavior of the logout endpoint to the application. The BFF's copy of the tokens is deleted with the session, and the
 authorization server accepts the refresh token until it expires.
 
+### Session lifetimes
+
+| What                                | Lifetime                          |
+|-------------------------------------|-----------------------------------|
+| BFF session                         | 30 minutes since the last request |
+| Authorization server login session  | 12 hours since the last request   |
+| Access token                        | 5 minutes                         |
+| Refresh token                       | 60 minutes from login             |
+
+Spring Authorization Server reuses the same refresh token on every refresh, so its expiry doesn't move. An active user
+stays signed in for about an hour. After that the authorization server rejects the refresh token, and the BFF ends its
+session and answers `401`. Section 6.1.2.2 of RFC 10017 suggests this: when the BFF learns that the refresh token is no
+longer valid, it makes sense to end the session. The same happens when a restart of the authorization server loses the
+in-memory authorizations. The BFF session isn't given a fixed lifetime equal to the refresh token's, which section
+6.1.2.2 also suggests, because servlet sessions only expire after inactivity. Ending the session when the refresh
+token is rejected has the same effect within the lifetime of one access token.
+
+The SPA shows the logged-out view whenever the BFF answers `401`, including after the BFF session has expired. Signing
+in again doesn't ask for the password while the authorization server's login session is alive.
+
+Refresh token rotation would extend the sign-in on every refresh. It's left out, because Spring's OAuth client doesn't
+serialize refreshes: two parallel requests would send the same refresh token, and the second one would be rejected.
+
 ## Compared with RFC 10017
 
 Section 6.1 of the RFC lists requirements for a BFF. This is how the project compares:
@@ -158,7 +181,5 @@ This is a local development setup. Before production at least the following shou
   store and a real password hash.
 - **In-memory state:** Sessions, OAuth authorizations and signing keys live in memory, so a restart signs users out and
   the services can't scale horizontally. Spring Session and persistent authorization storage and keys would fix this.
-- **Expired sessions in the SPA:** When a session expires, the SPA shows a generic error instead of returning to the
-  logged-out view. It needs a global handler for 401 responses.
 - **Configuration:** URLs are hard-coded for localhost. Production would use external configuration, and would serve
   the SPA from the same origin as the BFF so that CORS isn't needed.

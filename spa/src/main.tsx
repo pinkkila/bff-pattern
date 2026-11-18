@@ -3,26 +3,26 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.tsx'
 import AuthContextProvider from "./contexts/AuthContextProvider.tsx";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { MutationCache, QueryCache, QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { UnauthorizedError } from "./lib/queries.ts";
 
-const queryClient = new QueryClient();
-// const queryClient = new QueryClient({
-//   defaultOptions: {
-//     queries: {
-//       retry: (failureCount, error: any) => {
-//         if (error?.status === 401) return false;
-//         return failureCount < 3;
-//       },
-//     },
-//     mutations: {
-//       onError: (error: any) => {
-//         if (error?.status === 401) {
-//           queryClient.invalidateQueries({ queryKey: ["auth"] });
-//         }
-//       },
-//     },
-//   },
-// });
+// When the BFF session has ended, fetching userinfo again shows the logged-out view
+function handleError(error: Error) {
+  if (error instanceof UnauthorizedError) {
+    void queryClient.invalidateQueries({ queryKey: ["auth"] });
+  }
+}
+
+const queryClient = new QueryClient({
+  queryCache: new QueryCache({ onError: handleError }),
+  mutationCache: new MutationCache({ onError: handleError }),
+  defaultOptions: {
+    queries: {
+      retry: (failureCount, error) =>
+        !(error instanceof UnauthorizedError) && failureCount < 3,
+    },
+  },
+});
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

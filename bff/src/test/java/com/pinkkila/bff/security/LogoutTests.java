@@ -4,22 +4,16 @@ import jakarta.servlet.http.Cookie;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
-import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
 import org.springframework.mock.web.MockHttpSession;
-import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
-import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
 import org.springframework.security.oauth2.client.web.HttpSessionOAuth2AuthorizedClientRepository;
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizedClientRepository;
-import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.OidcLoginRequestPostProcessor;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
-
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.oidcLogin;
@@ -29,9 +23,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@Import(TestClientRegistrationConfig.class)
 class LogoutTests {
 
-    private static final String END_SESSION_ENDPOINT = "http://localhost:9000/connect/logout";
     private static final String SPA_URI = "http://localhost:5173";
     private static final String CSRF_TOKEN = "test-csrf-token";
 
@@ -50,7 +44,7 @@ class LogoutTests {
 
         this.mockMvc.perform(logoutRequest().session(session).with(login("id-token-value")))
                 .andExpect(status().isAccepted())
-                .andExpect(header().string(HttpHeaders.LOCATION, END_SESSION_ENDPOINT
+                .andExpect(header().string(HttpHeaders.LOCATION, TestClientRegistrationConfig.END_SESSION_ENDPOINT
                         + "?id_token_hint=id-token-value&post_logout_redirect_uri=" + SPA_URI));
 
         assertThat(session.isInvalid()).isTrue();
@@ -92,28 +86,6 @@ class LogoutTests {
         return oidcLogin()
                 .clientRegistration(this.clientRegistrationRepository.findByRegistrationId("bff-client"))
                 .idToken(idToken -> idToken.tokenValue(idTokenValue));
-    }
-
-    @TestConfiguration
-    static class ClientRegistrationConfig {
-
-        @Bean
-        ClientRegistrationRepository clientRegistrationRepository() {
-            ClientRegistration registration = ClientRegistration.withRegistrationId("bff-client")
-                    .clientId("bff-client-id")
-                    .clientSecret("secret")
-                    .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
-                    .redirectUri("{baseUrl}/login/oauth2/code/{registrationId}")
-                    .scope("openid", "profile", "message:read", "message:write")
-                    .authorizationUri("http://localhost:9000/oauth2/authorize")
-                    .tokenUri("http://localhost:9000/oauth2/token")
-                    .jwkSetUri("http://localhost:9000/oauth2/jwks")
-                    .userNameAttributeName("sub")
-                    .providerConfigurationMetadata(Map.of("end_session_endpoint", END_SESSION_ENDPOINT))
-                    .build();
-            return new InMemoryClientRegistrationRepository(registration);
-        }
-
     }
 
 }

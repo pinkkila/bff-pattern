@@ -3,6 +3,14 @@ import type { TMessageRequest, TMessagesPage, TUser } from "./types.ts";
 
 const BFF_URL = "http://localhost:8080";
 
+// The BFF answers 401 when its session has ended
+export class UnauthorizedError extends Error {
+  constructor() {
+    super("The session has ended");
+    this.name = "UnauthorizedError";
+  }
+}
+
 export async function getUserinfo(): Promise<TUser | null> {
   const response = await fetch(`${BFF_URL}/userinfo`, {
     credentials: "include",
@@ -53,6 +61,10 @@ export async function getMessages(): Promise<TMessagesPage> {
     credentials: "include",
   });
 
+  if (response.status === 401) {
+    throw new UnauthorizedError();
+  }
+
   if (!response.ok) {
     throw new Error(`Failed to fetch messages: ${response.statusText}`);
   }
@@ -72,6 +84,10 @@ export async function createMessage(messageRequest: TMessageRequest) {
     },
     body: JSON.stringify(messageRequest),
   });
+
+  if (response.status === 401) {
+    throw new UnauthorizedError();
+  }
 
   if (!response.ok) {
     throw new Error(
@@ -96,6 +112,10 @@ export async function updateMessage(
     body: JSON.stringify(messageRequest),
   });
 
+  if (response.status === 401) {
+    throw new UnauthorizedError();
+  }
+
   if (!response.ok) {
     throw new Error(
       "Something went wrong, when updating message. " + response.statusText,
@@ -114,6 +134,10 @@ export async function deleteMessage(id: number) {
       ...(csrfToken ? { "X-XSRF-TOKEN": csrfToken } : {}),
     },
   });
+
+  if (response.status === 401) {
+    throw new UnauthorizedError();
+  }
 
   if (!response.ok) {
     throw new Error(
