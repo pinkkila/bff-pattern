@@ -72,7 +72,7 @@ sequenceDiagram
 ```
 
 Access tokens live for five minutes. When one expires, the BFF gets a new one with the refresh token, and the SPA
-doesn't notice.
+doesn't notice. This works until the refresh token expires, as described in [Session lifetimes](#session-lifetimes).
 
 ### Logout flow
 
@@ -169,7 +169,7 @@ CORS only allows `http://localhost:5173`, and the cookies depend on every servic
 cd <service> && ./gradlew test
 ```
 
-The authorization server and resource server tests use Testcontainers, so Docker has to be running.
+The authorization server and resource server tests use Testcontainers, so Docker has to be running. The bff need authorization server running.
 
 ## Known limitations
 
