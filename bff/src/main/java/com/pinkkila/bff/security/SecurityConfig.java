@@ -29,8 +29,8 @@ import java.util.Set;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    @Value("${app.base-uri}")
-    private String appBaseUri;
+    @Value("${app.spa-uri}")
+    private String appSpaUri;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http,
@@ -49,7 +49,7 @@ public class SecurityConfig {
                 )
                 .oauth2Login(oauth2Login ->
                         oauth2Login
-                                .successHandler(new SimpleUrlAuthenticationSuccessHandler(this.appBaseUri)))
+                                .successHandler(new SimpleUrlAuthenticationSuccessHandler(this.appSpaUri)))
                 .logout(logout ->
                         logout
                                 .logoutSuccessHandler(oidcLogoutSuccessHandler(clientRegistrationRepository))
@@ -79,9 +79,9 @@ public class SecurityConfig {
     private LogoutSuccessHandler oidcLogoutSuccessHandler(ClientRegistrationRepository clientRegistrationRepository) {
         OidcClientInitiatedLogoutSuccessHandler handler =
                 new OidcClientInitiatedLogoutSuccessHandler(clientRegistrationRepository);
-        handler.setPostLogoutRedirectUri(this.appBaseUri);
+        handler.setPostLogoutRedirectUri(this.appSpaUri);
         // Used when there is no OIDC login to end, for example when the BFF session has already expired
-        handler.setDefaultTargetUrl(this.appBaseUri);
+        handler.setDefaultTargetUrl(this.appSpaUri);
         handler.setRedirectStrategy((request, response, url) -> {
             response.setStatus(HttpStatus.ACCEPTED.value());
             response.setHeader(HttpHeaders.LOCATION, url);

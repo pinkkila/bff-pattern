@@ -14,8 +14,8 @@ import java.util.Collections;
 @Configuration(proxyBeanMethods = false)
 public class CorsConfig {
     
-    @Value("${app.base-uri}")
-    private String appBaseUri;
+    @Value("${app.spa-uri}")
+    private String appSpaUri;
     
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
@@ -24,7 +24,7 @@ public class CorsConfig {
         config.addAllowedHeader(HttpHeaders.CONTENT_TYPE);
         config.addExposedHeader(HttpHeaders.LOCATION);
         config.setAllowedMethods(Arrays.asList("GET", "HEAD", "POST", "PUT", "DELETE", "OPTIONS"));
-        config.setAllowedOrigins(Collections.singletonList(this.appBaseUri));
+        config.setAllowedOrigins(Collections.singletonList(this.appSpaUri));
         config.setAllowCredentials(true);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);

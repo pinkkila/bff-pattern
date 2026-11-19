@@ -53,7 +53,7 @@ spring:
                 - TokenRelay=
 
 app:
-  base-uri: http://localhost:5173
+  spa-uri: http://localhost:5173
   authorization-server-uri: http://localhost:9000
   resource-server-uri: http://localhost:8090
 

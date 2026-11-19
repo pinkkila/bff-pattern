@@ -7,12 +7,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 public class DefaultController {
     
-    @Value("${app.base-uri}")
-    private String appBaseUri;
+    @Value("${app.spa-uri}")
+    private String appSpaUri;
     
     @GetMapping("/")
     public String root() {
-        return "redirect:" + this.appBaseUri;
+        return "redirect:" + this.appSpaUri;
     }
     
 }
