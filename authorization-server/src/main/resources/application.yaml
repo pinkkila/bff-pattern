@@ -18,7 +18,6 @@ spring:
   security:
     oauth2:
       authorizationserver:
-        # A fixed issuer, so the "iss" claim doesn't depend on the host name a request uses
         issuer: http://localhost:9000
         client:
           bff-client:
@@ -42,7 +41,6 @@ spring:
             require-authorization-consent: true
 
 app:
-  # The "aud" claim of access tokens. It identifies the resource server, which only accepts tokens with this audience.
   access-token-audience: http://localhost:8090
 
 management:

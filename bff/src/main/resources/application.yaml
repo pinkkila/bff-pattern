@@ -21,7 +21,11 @@ spring:
             client-secret: secret
             authorization-grant-type: authorization_code
             redirect-uri: "http://localhost:8080/login/oauth2/code/{registrationId}"
-            scope: openid, profile, message:read, message:write
+            scope:
+              - openid
+              - profile
+              - message:read
+              - message:write
             client-name: "BFF Pattern Application"
         provider:
           authorization-server:
@@ -32,7 +36,6 @@ spring:
       server:
         webmvc:
           routes:
-            # The browser's cookies stay at the BFF. Downstream services get only the access token.
             - id: userinfo
               uri: ${app.authorization-server-uri}
               predicates:
